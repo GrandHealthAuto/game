@@ -5,6 +5,7 @@ Camera     = require 'hump.camera'
 GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
 Entities   = require 'entities'
+require 'slam'
 
 function GS.transition(to, length, ...)
 	length = length or 1
