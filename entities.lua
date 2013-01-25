@@ -29,4 +29,4 @@ return setmetatable({
 			(e[func] or _NOP_)(...)
 		end
 	end
-end}
+end})
