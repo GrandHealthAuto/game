@@ -23,7 +23,7 @@ end
 return setmetatable({
 	add      = add,
 	remove   = remove,
-}, {__index = function(_, f)
+}, {__index = function(_, func)
 	return function(...)
 		for e in pairs(entities) do
 			(e[func] or _NOP_)(...)
