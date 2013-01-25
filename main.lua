@@ -4,6 +4,7 @@ vector     = require 'hump.vector'
 Camera     = require 'hump.camera'
 GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
+Entities   = require 'entities'
 
 function GS.transition(to, length, ...)
 	length = length or 1
@@ -69,18 +70,30 @@ local function Proxy(f)
 	end})
 end
 
-State = Proxy(function(path) return require('states.' .. path) end)
-Image = Proxy(function(path)
+-- e.g. GS.switch(State.menu)
+State  = Proxy(function(path) return require('states.' .. path) end)
+
+-- e.g. Entity.pawn(x,y) -- spawns pawn at x,y
+Entity = Proxy(function(path) return require('entities.' .. path) end)
+
+-- e.g. love.graphics.draw(Image.car, self.x, self.y)
+Image  = Proxy(function(path)
 	local i = love.graphics.newImage('img/'..path..'.png')
 	i:setFilter('nearest', 'nearest')
 	return i
 end)
-Font  = Proxy(function(arg)
+
+-- e.g. love.graphics.setFont(Font[30])
+--      love.graphics.setFont(Font.fontface[20])
+Font = Proxy(function(arg)
 	if tonumber(arg) then
 		return love.graphics.newFont(arg)
 	end
 	return Proxy(function(size) return love.graphics.newFont('font/'..arg..'.ttf', size) end)
 end)
+
+-- e.g. Sound.static.splatter:play()
+--      Sound.stream.music:play()
 Sound = {
 	static = Proxy(function(path) return love.audio.newSource('snd/'..path..'.ogg', 'static') end),
 	stream = Proxy(function(path) return love.audio.newSource('snd/'..path..'.ogg', 'stream') end)
