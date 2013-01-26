@@ -14,3 +14,9 @@ victim-pickup-abort
 
 victim-picked-up
     - victim picked up/delivered (player stayed in zone)
+
+pedestrian-injured (pedestrian)
+    - pedestrian was injured by the ambulance
+
+pedestrian-killed (pedestrian)
+    - pedestrian was injured by the ambulance

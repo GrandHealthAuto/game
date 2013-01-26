@@ -127,6 +127,8 @@ function pedestrian:update(dt)
 	self:updateState()
 	self:detectCollision()
 
+	self.state = 'stop'
+
 	if self.state == 'left' then
 		self.angle_velocity = -4
 	elseif self.state == 'right' then
@@ -152,6 +154,16 @@ function pedestrian:update(dt)
 	end
 
 	self:updateToPhysics()
+end
+
+function pedestrian:beginContact (other_entity, contact_point, contact_normal, contact_velocity) 
+	local impact = -contact_normal * contact_velocity
+
+	if impact > GVAR.pedestrian_impact_kill then
+		Signal.emit('pedestrian-killed', self)
+	elseif impact > GVAR.pedestrian_impact_injury then
+		Signal.emit('pedestrian-injured', self)
+	end
 end
 
 function pedestrian:draw()

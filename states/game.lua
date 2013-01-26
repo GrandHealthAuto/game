@@ -36,11 +36,11 @@ function st:endContact (a, b, coll)
 	local entity_b = b:getUserData()
 
 	if entity_a.endContact ~= nil then
-		entity_a:endContact (entity_b, coll)
+		entity_a:endContact (entity_b)
 	end
 
 	if entity_b.endContact ~= nil then
-		entity_b:endContact (entity_a, coll)
+		entity_b:endContact (entity_a)
 	end
 end
 
@@ -60,6 +60,10 @@ function st:enter()
 		local pedestrian = Entity.pedestrian (pos, math.random(0,3.1415), "Person " .. i)
 		table.insert(self.pedestrians, pedestrian)
 	end
+
+	-- test pedestrian
+	local pedestrian = Entity.pedestrian (vector(2580, 3120) , 0., "Crash Dummy")
+	table.insert(self.pedestrians, pedestrian)
 
 	cam = Camera()
 	cam.scale = 2
@@ -93,6 +97,14 @@ function st:enter()
 	end)
 	Signal.register('victim-pickup-abort', function()
 		self.pickup_progress = 0
+	end)
+
+	-- pedestrians
+	Signal.register('pedestrian-injured', function (pedestrian)
+		print ("Pedestrian at " .. tostring (pedestrian.pos) .. " was injured.")
+	end)
+	Signal.register('pedestrian-killed', function (pedestrian)
+		print ("Pedestrian at " .. tostring (pedestrian.pos) .. " was killed.")
 	end)
 
 	Signal.emit('victim-picked-up')

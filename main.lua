@@ -25,7 +25,9 @@ GVAR = {
 	player_rotation_speed = 220 * math.pi / 180.,
 
 	pedestrian_linear_damping = 0.1 * 32,
-	pedestriang_angular_damping = 10
+	pedestriang_angular_damping = 10,
+	pedestrian_impact_injury = 3000,
+	pedestrian_impact_kill = 6000,
 }
 
 function serialize(t, indent)
