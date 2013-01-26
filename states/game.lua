@@ -27,11 +27,7 @@ function st:init()
             table.insert(self.cars, car)
         end
 
-	map, geometry = (require 'level-loader')('map.png', {
-		width = 32, height = 32, {name = 'foo'}, {name = 'foo', is_collision_tile = true}
-	}, {texture = 'tiles.png', frames = {
-		{name = 'foo', uvRect = {u0 = 0, v0 = 0, u1 = 1, v1 = 1}}
-	}})
+	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	cam = Camera()
 
 	for rect in pairs(geometry) do

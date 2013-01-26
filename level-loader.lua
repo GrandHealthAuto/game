@@ -47,10 +47,11 @@
 -- and   `geometry' is a set of {x = x, y = y, w = w, h = h} tables
 return function(map_path, tile_info, tile_data)
 	local atlas = Image[tile_data.texture:match('^(.+)%.png$')]
-	local refw, refh = atlas:getWidth(), atlas:getHeight()
+	local REF_W, REF_H = atlas:getWidth(), atlas:getHeight()
 	local quads = {}
 	for _,frame in ipairs(tile_data.frames) do
 		local tc = frame.uvRect
+		local size = frame.spriteSourceSize
 		quads[frame.name] = love.graphics.newQuad(tc.u0, tc.v0, tc.u1-tc.u0, tc.v1-tc.v0, 1,1)
 	end
 
@@ -71,7 +72,7 @@ return function(map_path, tile_info, tile_data)
 		collision_boxes[y] = {}
 		for x = 0,image_data:getWidth()-1 do
 			local hex = ("%02x%02x%02x%02x"):format(image_data:getPixel(x,y))
-			local tile = tile_info[color_to_tile[hex]]
+			local tile = tile_info[color_to_tile[hex]] or {}
 			if tile.name then
 				row[x+1] = quads[tile.name]
 			end
@@ -124,16 +125,26 @@ return function(map_path, tile_info, tile_data)
 		x0,y0 = math.floor(x0/TW)+1, math.floor(y0/TH)+1
 		x1,y1 = math.ceil(x1/TW)+1, math.ceil(y1/TH)+1
 
-		x0,y0 = math.max(1, x0), math.max(1, y0)
+		x0,y0 = math.max(1, x0-5), math.max(1, y0-5)
 
-		for i = y0,y1 do
+		for i = y0,y1+5 do
 			local row = self[i]
-			for k = x0,x1 do
+			for k = x0,x1+5 do
 				if row and row[k] then
-					love.graphics.drawq(self.atlas, row[k], (k-1)*TW, (i-1)*TH, 0, TW, TH)
+					local q = row[k]
+					love.graphics.drawq(self.atlas, q, (k-1)*TW, i*TH, 0, REF_W,REF_H)
 				end
 			end
 		end
+	end
+
+	function map:tileCoords(x,y)
+		return math.floor(x0/TW)+1, math.floor(y0/TH)+1
+	end
+
+	function map:tileAt(x,y)
+		x,y = self:tileCoords(x,y)
+		return (map[y] or {})[x]
 	end
 
 	return map, geometry
