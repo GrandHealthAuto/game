@@ -149,10 +149,11 @@ function love.load()
 	Input.bind{name = 'left',   key = {'left',  'a'}, axis = -1}
 	Input.bind{name = 'right',  key = {'right', 'd'}, axis = 1}
 	Input.bind{name = 'up',     key = {'up',    'w'}, axis = {-2}}
-	Input.bind{name = 'down',   key = {'down',  's'}, axis = {2}} 
+	Input.bind{name = 'down',   key = {'down',  's'}, axis = {2}}
 	Input.bind{name = 'accelerate', key = {'up', 'w'}, axis = {-3}}
 	Input.bind{name = 'decelerate', key = {'down','s'}, axis = {3}}
 	Input.bind{name = 'action', key = {' ', 'enter', 'return'}, button = 1}
+	Input.bind{name = 'escape', key = 'escape'} -- FIXME: add start button
 end
 
 function love.update(dt)
@@ -162,7 +163,10 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-	if key == 'escape' then
+end
+
+function Input.mappingDown(mapping, mag)
+	if mapping == 'escape' then
 		local continue
 		continue = Interrupt{
 			draw = function(draw)
@@ -173,21 +177,22 @@ function love.keypressed(key)
 				love.graphics.setColor(255,255,255)
 				love.graphics.setFont(Font[30])
 				love.graphics.printf("PAUSE", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-			end, update = function() end,
-			keypressed = function(_,key)
-				if key == 'escape' then
-					love.audio.stop()
-					GS.switch(State.menu)
-					continue()
-				elseif key == ' ' then
-					continue()
-				end
-			end,
+			end, update = function() Input.update() end,
 		}
-	end
-end
 
-function Input.mappingDown(mapping, mag)
+		local mappingDown = Input.mappingDown
+		Input.mappingDown = function(mapping, mag)
+			if mapping == 'escape' then
+				love.audio.stop()
+				GS.switch(State.menu)
+				continue()
+				Input.mappingDown = mappingDown
+			elseif mapping == 'action' then
+				continue()
+				Input.mappingDown = mappingDown
+			end
+		end
+	end
 	GS.mappingDown(mapping, mag)
 end
 
