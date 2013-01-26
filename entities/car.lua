@@ -5,18 +5,18 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.name = name
 		self.angle = angle
 
-		self.speed = 30
+		self.speed = 120
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
 
-		self.angleRotateSide = 3.14159 / 180
+		self.angleRotateSide = 3.14159 / 180 * 5
 		self.rayCastLengthForward = 35
 		self.rayCastLengthSide = 20
 		self.rayCastAngleSide = 3.14159 / 4 -- 45°
 
 		self.hitList = {}
-		self.debug = true
+		self.debug = false
 	end
 }
 
@@ -33,7 +33,8 @@ end
 
 function car:changeState(state)
 	if self.state ~= state then
-	self:log("Change state from " .. self.state .. " to " .. state)
+		self:log("Change state from " .. self.state .. " to " .. state)
+		self.state = state
 	end
 end
 
@@ -69,6 +70,7 @@ function car:mergeList(one, another)
 end
 
 function car:detectCollision(hitList)
+	self.hitList = {}
 
 	local hitsForward = {}
 	local headingForward = vector (math.cos(self.angle), math.sin(self.angle))
@@ -101,10 +103,10 @@ function car:detectCollision(hitList)
 	-- We turn right if something is on the left and on the right it is free.
 	-- Or vise versa. If there is something on the left and on the right we stop
 	if #hitsLeft > 0 and #hitsRight == 0 then
-		self:log("Left collision (" .. #hitsLeft .. ", " .. #hitsRight .. " right)")
+		self:log("Left collision (" .. #hitsLeft .. " left, " .. #hitsRight .. " right)")
 		self:changeState('right')
 	elseif #hitsRight > 0 and #hitsLeft == 0 then
-		self:log("Right collision (" .. #hitsLeft .. ", " .. #hitsRight .. " right)")
+		self:log("Right collision (" .. #hitsLeft .. " left, " .. #hitsRight .. " right)")
 		self:changeState('left')
 	elseif #hitsRight > 0 and #hitsLeft then
 		self:log("Left and right collision (" .. #hitsLeft .. ", " .. #hitsRight .. " right)")
