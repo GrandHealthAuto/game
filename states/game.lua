@@ -62,7 +62,8 @@ function st:enter()
 	end
 
 	cam = Camera()
-    cam.scale = 2
+	cam.scale = 2
+	cam.pos = vector(cam.x, cam.y)
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
@@ -131,7 +132,18 @@ end
 
 local timeslice = 0
 function st:update(dt)
-	cam:lookAt(self.player.pos:unpack())
+	cam.target    = self.player.pos
+	cam.direction = cam.target - cam.pos
+	local delta = cam.direction * dt * 5
+	if math.abs(cam.direction.x) > SCREEN_WIDTH/3 then
+		delta.x = cam.direction.x
+	end
+	if math.abs(cam.direction.y) > SCREEN_HEIGHT/3 then
+		delta.y = cam.direction.y
+	end
+	cam.pos = cam.pos + delta
+	cam:lookAt(math.floor(cam.pos.x+.5), math.floor(cam.pos.y+.5))
+
 	if self.world then
 		timeslice = timeslice + dt
 		while timeslice > 1/60 do
