@@ -139,6 +139,10 @@ function st:enter()
 	Signal.emit('get-next-victim')
 
 	self.heart_monitor = Entity.heartmonitor()
+	
+	self.radio = Sound.static.reggae:play()
+	self.radio:setVolume(0.5)
+	self.radio:setLooping()
 end
 
 function st:leave()
