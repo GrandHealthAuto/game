@@ -6,6 +6,18 @@ local player = class{name = "Player", inherits = Entity.BaseEntity,
 		self.linear_damping = GVAR.player_linear_damping
 		self.angular_damping = GVAR.player_angular_damping
 		self.shape_offset = vector(14,0)
+
+		self.physics.shape = love.physics.newPolygonShape(
+			-28 + 14,  7,
+			-23 + 14,  12,
+			 23 + 14,  12,
+			 28 + 14,  7,
+			 28 + 14, -7,
+			 23 + 14, -12,
+			-23 + 14, -12,
+			-28 + 14, -7
+		)
+
 		self:initSound()
 	end
 }
