@@ -51,6 +51,7 @@ function st:init()
         for i = 1,30 do
             local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
             local car = Entity.car (pos, math.random(0,3.1415), "car" .. i)
+            car:registerPhysics (self.world, 1.)
             table.insert(self.cars, car)
         end
 

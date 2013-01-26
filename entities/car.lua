@@ -8,6 +8,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
                 self.state = 'drive'
                 self.lastStateUpdate = love.timer.getMicroTime()
 
+                self.angleRotateSide = 3.14159 / 2 -- 90°
                 self.rayCastLengthForward = 35
                 self.rayCastLengthSide = 20
                 self.rayCastAngleSide = 3.14159 / 4 -- 45°
@@ -35,14 +36,18 @@ function car:updateState()
 
     local oldState = self.state
     local r = math.random(0, 100)
-    if r < 70 then
-        self.state = 'drive'
+    if r < 20 then
+        self.state = 'fastdrive' -- 20%
+    elseif r < 60 then
+        self.state = 'drive' -- 40%
+    elseif r < 70 then
+        self.state = 'slowdrive' -- 10%
     elseif r < 80 then
-        self.state = 'left'
+        self.state = 'left' -- 10%
     elseif r < 90 then
-        self.state = 'right'
+        self.state = 'right' -- 10%
     else
-        self.state = 'halt'
+        self.state = 'halt' -- 10%
     end
 
     if self.debug and oldState ~= self.state then
@@ -75,10 +80,10 @@ function car:update(dt)
         self:updateState()
         
         if self.state == 'left' then
-            self.angle = self.angle - 3.14159 / 2
+            self.angle = self.angle - self.angleRotateSide
             self.state = 'drive'
         elseif self.state == 'right' then
-            self.angle = self.angle + 3.14159 / 2
+            self.angle = self.angle + self.angleRotateSide
             self.state = 'drive'
         end
             
@@ -95,8 +100,12 @@ function car:update(dt)
             self.angle = self.angle + 0.3
         end
 
-	if self.state == 'drive' then
+	if self.state == 'fastdrive' then
+            self.pos = self.pos + dt * self.velocity * 2
+	elseif self.state == 'drive' then
             self.pos = self.pos + dt * self.velocity	
+	elseif self.state == 'slowdrive' then
+            self.pos = self.pos + dt * self.velocity * 0.5	
         end
 	self.angle = self.angle + dt * self.angle_velocity
         
