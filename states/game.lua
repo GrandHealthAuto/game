@@ -50,8 +50,7 @@ function st:init()
         self.cars = {}
         for i = 1,30 do
             local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
-            local car = Entity.car (pos)
-            car.angle = math.random(0, 3.1415)
+            local car = Entity.car (pos, math.random(0,3.1415), "car" .. i)
             table.insert(self.cars, car)
         end
 
