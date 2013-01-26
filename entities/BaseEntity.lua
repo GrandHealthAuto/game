@@ -2,6 +2,7 @@ local base_entity = class{name = "BaseEntity", function (self, pos, dimensions)
 	self.pos = pos:clone()
 	self.dimensions = dimensions:clone()
 	self.velocity = vector(0,0)
+	self.center = vector(0,0)
 	self.angle = 0
 	self.angle_velocity = 0
 	self.mass = self.mass or 0
@@ -17,6 +18,7 @@ function base_entity:draw()
 		old_color = { love.graphics.getColor() }
 
 		love.graphics.setColor(255, 0., 0., 255)
+
 		love.graphics.push()
 		love.graphics.translate (self.pos.x, self.pos.y)
 		love.graphics.rotate (self.angle)
@@ -27,6 +29,7 @@ function base_entity:draw()
 		self.dimensions.x,
 	  self.dimensions.y
 		)
+
 		love.graphics.pop()
 
 		love.graphics.setColor(old_color)

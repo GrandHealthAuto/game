@@ -15,9 +15,11 @@ require 'slam'
 GVAR = {
 	draw_collision_boxes = true,
 
-	player_linear_damping = 0.05 * 32,
-	player_accel = 15. * 32, -- m/s^2
-	player_accel_max_speed = 10 * 32, -- m/s
+	player_linear_damping = 0.15 * 32,
+	player_angular_damping = 0.1,
+
+	player_accel = 35. * 32, -- m/s^2
+	player_accel_max_speed = 20 * 32, -- m/s
 	player_reverse = -10. * 32, -- m/s^2
 	player_reverse_max_speed = 10. * 32, -- m/s
 	player_rotation_speed = 220 * math.pi / 180.,

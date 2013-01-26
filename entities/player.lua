@@ -2,8 +2,9 @@ local player = class{name = "Player", inherits = Entity.BaseEntity,
 	function (self, pos)
 		Entity.BaseEntity.construct (self, pos, vector(56, 24))
 		self.visual = Image.ambulancebig
-		self.mass = 1
+		self.mass = 5
 		self.linear_damping = GVAR.player_linear_damping
+		self.angular_damping = GVAR.player_angular_damping
 	end
 }
 
@@ -25,17 +26,13 @@ function player:update(dt)
 	local heading = vector(math.cos (self.angle), math.sin (self.angle))
 	local heading_dot_velocity = heading.x * self.velocity.x + heading.y * self.velocity.y
 
-	self.angle_velocity = 0.
+-- self.angle_velocity = 0.
 
-	if Input.isDown('right') then
-		self.angle_velocity = GVAR["player_rotation_speed"] * speed / GVAR["player_accel_max_speed"]
-	end
-
-	if Input.isDown('left') then
-		self.angle_velocity = - GVAR["player_rotation_speed"] * speed / GVAR["player_accel_max_speed"]
-	end
+	local rotation_speed_factor = math.min (speed, 320) / 320
 
 	if Input.isDown('accelerate') then
+		self.angle_velocity = 0.
+
 		if speed < GVAR["player_accel_max_speed"] then
 			local drag_penalty = 1.
 
@@ -59,6 +56,14 @@ function player:update(dt)
 		end
 
 		self.angle_velocity = - self.angle_velocity
+	end
+
+	if Input.isDown('right') then
+		self.angle_velocity = GVAR["player_rotation_speed"] * rotation_speed_factor
+	end
+
+	if Input.isDown('left') then
+		self.angle_velocity = - GVAR["player_rotation_speed"] * rotation_speed_factor
 	end
 
 	self.velocity = self.velocity + dt * acceleration
