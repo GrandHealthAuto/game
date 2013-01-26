@@ -20,7 +20,7 @@ function base_entity:draw()
 		)
 	else
 		love.graphics.rectangle (
-		'fill',
+		'line',
 		self.pos.x - self.dimensions.x * 0.5,
 		self.pos.y - self.dimensions.y * 0.5,
 		self.dimensions.x,
