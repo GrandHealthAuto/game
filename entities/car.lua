@@ -1,18 +1,19 @@
 local car = class{name = "Car", inherits = Entity.BaseEntity,
 	function (self, pos, angle, name)
-		Entity.BaseEntity.construct (self, pos, vector(15, 28))
+		Entity.BaseEntity.construct (self, pos, vector(28, 15))
 		self.visual = Image.car
 		self.name = name
-		self.angle = angle
+		self.angle = 0
 		self.shape_offset = vector(7,0)
-		self.targetPos = vector(0,0)
-		self.speed = 70
+		self.targetPos = pos
+		self.speed = 130
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
 
 		self.direction = 'east'
 		self.hitList = {}
+		self.debugLines = {}
 		self.debug = false
 	end
 }
@@ -21,8 +22,8 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 function car:getCollisionLines() 
 	local lines = {}
 	
-	local headingSize = 40
-	local headingAngle = 3.14159 / 36 * 6 -- 30°
+	local headingSize = 30
+	local headingAngle = 3.14159 / 36 * 3 -- 15°
 
 	local headingLeft = self.pos + headingSize * vector (math.cos(self.angle - headingAngle), math.sin(self.angle - headingAngle))
 	local headingRight = self.pos + headingSize * vector (math.cos(self.angle + headingAngle), math.sin(self.angle + headingAngle))
@@ -83,17 +84,12 @@ function car:getAngle(p1, p2)
 	local x = p2.x - p1.x
 	local y = p2.y - p1.y
 
-	if x == 0 and y >= 0 then
-		return 0
-	elseif x == 0 then
-		return 3.14159
-	else
-		return math.atan2(y, x)
-	end
+	return math.atan2(y, x)
 end
 
 function car:updatePosition(dt, angle) 
 	local heading = vector (math.cos(angle), math.sin(angle))
+	self.angle_velocity = angle - self.angle
 	
 	if self.state == 'drive' then
 		self.velocity = heading * self.speed
@@ -103,34 +99,108 @@ function car:updatePosition(dt, angle)
 	end
 end
 
-function car:getMapDx()
+function car:targetVector()
 	if self.direction == 'east' then
-		return 1
+		return vector(1, 0)
 	elseif self.direction == 'west' then
-		return -1
-	else
-		return 0
-	end
-end
-
-function car:getMapDy()
-	if self.direction == 'south' then
-		return 1
+		return vector(-1, 0)
+	elseif self.direction == 'south' then
+		return vector(0, 1)
 	elseif self.direction == 'north' then
-		return -1
+		return vector(0, -1)
 	else
-		return 0
+		return vector(0, 0)
 	end
 end
 
-function car:canDriveAhead(map, x, y, dx, dy)
-	self:log(x .. "," .. y .. ":isStreet: " .. tostring(map:isStreet(x, y)))
-	self:log(x .. "," .. y .. ":isSidewalk: " .. tostring(map:isSidewalk(x, y)))
-	if map:isStreet(x + dx, y + dy) then
-		self:log("is street")
+function car:canDriveAhead(map, pos, v)
+	local rV = v:rotated(math.pi / 2)
+	
+	local ahead = pos + v
+	local right = pos + rV
+	-- self:log("pos=" .. pos.x .. ","..pos.y.." v=" .. v.x .. ","..v.y.." ahead="..ahead.x..","..ahead.y.." right="..right.x..","..right.y)
+	-- self:log("isStreet ahead " .. tostring(map:isStreet(ahead.x, ahead.y)) .. "right ahead " .. tostring(map:isStreet(right.x, right.y)))
+	
+	-- normal stret
+	if map:isStreet(ahead.x, ahead.y) and not map:isStreet(right.x, right.y) then
+		self:log("Hit ahead!")
 		return true
 	end
 	return false
+end
+
+function car:needTrackChange(map, pos, v)
+	local rV = v:rotated(math.pi / 2)
+
+	local ahead = pos + v + rV
+	local right = pos + 4 * rV
+	if map:isStreet(ahead.x, ahead.y) and not map:isStreet(right.x, right.y) then
+		self:log("Change track")
+		return true
+	end
+	return false
+end
+
+function car:getLeftDirection()
+	if self.direction == 'north' then
+		return 'west'
+	elseif self.direction == 'west' then
+		return 'south'
+	elseif self.direction == 'south' then
+		return 'east'
+	else
+		return 'north'
+	end
+end
+
+function car:getRightDirection()
+	if self.direction == 'north' then
+		return 'east'
+	elseif self.direction == 'east' then
+		return 'south'
+	elseif self.direction == 'south' then
+		return 'west'
+	else
+		return 'north'
+	end
+end
+
+function car:findNextTarget(map, pos, v)
+	local lV = v:rotated(- math.pi / 2)
+	local rV = v:rotated(math.pi / 2)
+
+	local ahead = pos + v
+	local ahead4 = pos + 5 * v
+	local right = pos + rV
+	local right4 = pos + 5 * rV
+	local left = pos + lV
+	local left4 = pos + 5 * lV
+
+	local changes = {}
+	if map:isStreet(ahead.x, ahead.y) and map:isStreet(ahead4.x, ahead4.y) then
+		self:log("Find next target: Can drive ahead")
+		table.insert(changes, {name = 'ahead', target = ahead, direction = self.direction})
+	end
+	if map:isStreet(right.x, right.y) and map:isStreet(right4.x, right4.y) then
+		self:log("Find next target: Can turn right")
+		table.insert(changes, {name = 'right', target = right, direction = self:getRightDirection(self.direction)})
+	end
+	if map:isStreet(left.x, left.y) and map:isStreet(left4.x, left4.y) then
+		self:log("Find next target: Can turn left")
+		table.insert(changes, {name = 'left', target = left, direction = self:getLeftDirection(self.direction)})
+	end
+	if #changes == 0 then
+		self:log("Find next target: Must return")
+		self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
+		return pos - v
+	end
+	local i = math.floor(math.random(0, #changes - 1)) + 1
+	self:log("length " .. #changes .. " i " .. i)
+	if changes[i].direction ~= self.direction then
+		self:log("Change direction from " .. self.direction .. " to " .. changes[i].direction)
+		self.direction = changes[i].direction
+	end
+	return map:mapCoordsCenter(changes[i].target.x, changes[i].target.y)
 end
 
 -- Returns new direction. One of north, east, south, west, 
@@ -138,17 +208,24 @@ end
 function car:getTargetPosition()
 	local map = State.game.map
 	local x, y = map:tileCoords(self.pos.x, self.pos.y)
-	self:log(self.pos.x .. "," .. self.pos.y .. " at tile " .. x .. "," .. y)
-
-	local dx = self:getMapDx()
-	local dy = self:getMapDy()
 	
-	if self:canDriveAhead(map, x, y, dx, dy) then
-		local x1, y1, x2, y2 = map:mapCoords(x + dx, y + dy)
-		return vector(math.floor(x2 - x1), math.floor(y2 - y1))
+	-- Check if we are in the target. If not we continue
+	local targetX, targetY = map:tileCoords(self.targetPos.x, self.targetPos.y)
+	if (x ~= targetX or y ~= targetY) then
+		return self.targetPos
+	end
+
+	local pos = vector(x, y)
+	local v = self:targetVector()
+
+	if self:canDriveAhead(map, pos, v) then
+		local ahead = pos + v
+		return map:mapCoordsCenter(ahead.x, ahead.y)
+	elseif self:needTrackChange(map, pos, v) then
+		local ahead = pos + v + v:rotated(math.pi / 2)
+		return map:mapCoordsCenter(ahead.x, ahead.y)
 	else
-		self:log("Can not drive forward")
-		return self.pos
+		return self:findNextTarget(map, pos, v)
 	end
 end
 
@@ -160,7 +237,7 @@ function car:update(dt)
 	self:updateStateMachine()
 	self.targetPos = self:getTargetPosition()
 	local angle = self:getAngle(self.pos, self.targetPos)
-	self:log("Target position is " .. self.targetPos.x .. ", " .. self.targetPos.y .. " with angle " .. angle)
+	--self:log("Target position is " .. self.targetPos.x .. ", " .. self.targetPos.y .. " with angle " .. angle)
 	self:updatePosition(dt, angle)
 
 	self:updateToPhysics()
