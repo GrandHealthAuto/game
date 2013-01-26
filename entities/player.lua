@@ -5,8 +5,20 @@ local player = class{name = "Player", inherits = Entity.BaseEntity,
 		self.mass = 5
 		self.linear_damping = GVAR.player_linear_damping
 		self.angular_damping = GVAR.player_angular_damping
+		self.shape_offset = vector(14,0)
+		self:initSound()
 	end
 }
+
+function player:initSound()
+	Sound.static.enginestart:setVolume(0.2)
+    Sound.static.enginestart:play()
+    self.runningsfx = Sound.static.enginerunning:play()
+	self.runningsfx:setLooping(true)
+	self.runningsfx:setVolume(0.2)
+	self.motorspeed = 0.5
+	self.runningsfx:setPitch(self.motorspeed)
+end
 
 function player:update(dt)
 	self:updateFromPhysics()
@@ -67,7 +79,11 @@ function player:update(dt)
 	end
 
 	self.velocity = self.velocity + dt * acceleration
-
+	
+	self.motorspeed = speed / GVAR["player_accel_max_speed"]
+	self.runningsfx:setPitch(0.5 + self.motorspeed*0.5)
+	self.runningsfx:setVolume(0.05 + self.motorspeed*0.5)
+	
 	self:updateToPhysics()
 end
 

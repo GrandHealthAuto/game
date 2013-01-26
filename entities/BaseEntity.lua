@@ -7,6 +7,7 @@ local base_entity = class{name = "BaseEntity", function (self, pos, dimensions)
 	self.angle_velocity = 0
 	self.mass = self.mass or 0
 	self.physics = {}
+	self.shape_offset = vector(0,0)
 
 	--print ("adding base_entity")
 	Entities.add(self)
@@ -15,33 +16,27 @@ end
 
 function base_entity:draw()
 	if GVAR.draw_collision_boxes or self.visual == nil then
-		old_color = { love.graphics.getColor() }
+		old_color = {love.graphics.getColor() }
 
 		love.graphics.setColor(255, 0., 0., 255)
 
 		love.graphics.push()
 		love.graphics.translate (self.pos.x, self.pos.y)
 		love.graphics.rotate (self.angle)
-		love.graphics.rectangle (
-		'line',
-		- self.dimensions.x * 0.5,
-		- self.dimensions.y * 0.5,
-		self.dimensions.x,
-	  self.dimensions.y
-		)
-
+		love.graphics.rectangle('line',
+			-self.dimensions.x * 0.5 + self.shape_offset.x, -self.dimensions.y * 0.5 + self.shape_offset.y,
+			self.dimensions.x, self.dimensions.y)
 		love.graphics.pop()
 
 		love.graphics.setColor(old_color)
 	end
 
 	if self.visual then
-		love.graphics.draw (
-		self.visual,
-		self.pos.x, self.pos.y, self.angle,
-		1, 1,
-		self.visual:getWidth() * 0.5, self.visual:getHeight() * 0.5 
-		)
+		love.graphics.draw(self.visual,
+			self.pos.x, self.pos.y, self.angle,
+			1, 1,
+			self.visual:getWidth() * 0.5 - self.shape_offset.x,
+			self.visual:getHeight() * 0.5 - self.shape_offset.y)
 	end
 
 end
@@ -56,7 +51,7 @@ function base_entity:registerPhysics(world)
 	self.physics.body:setLinearDamping (self.linear_damping or 10)
 	self.physics.body:setAngularDamping (self.linear_damping or 10)
 
-	self.physics.shape = self.physics.shape or love.physics.newRectangleShape(0, 0, self.dimensions.x, self.dimensions.y)
+	self.physics.shape = self.physics.shape or love.physics.newRectangleShape(self.shape_offset.x, self.shape_offset.y, self.dimensions:unpack())
 
 	self.physics.fixture = self.physics.fixture or love.physics.newFixture(self.physics.body, self.physics.shape, 1)
 

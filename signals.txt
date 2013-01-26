@@ -1,0 +1,16 @@
+================================================================
+Signal name (arguments)
+    - explanation
+================================================================
+XXX: Wenn ausserhalb von states/game.lua signale benutzt werden,
+     muss State.game:leave() angepasst werden
+================================================================
+
+victim-pickup-timer (number progress in [0:1])
+    - update victim pickup/delivery progress
+
+victim-pickup-abort
+    - victim pickup/deliver was aborted (player left zone)
+
+victim-picked-up
+    - victim picked up/delivered (player stayed in zone)

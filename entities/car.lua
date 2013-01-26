@@ -4,13 +4,14 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.visual = Image.car
 		self.name = name
 		self.angle = angle
+		self.shape_offset = vector(7,0)
 
 		self.speed = 120
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
 
-		self.angleRotateSide = 3.14159 / 180 * 5
+		self.angleSpeed = 10
 		self.rayCastLengthForward = 35
 		self.rayCastLengthSide = 20
 		self.rayCastAngleSide = 3.14159 / 4 -- 45°
@@ -35,18 +36,16 @@ function car:changeState(state)
 	if self.state ~= state then
 		self:log("Change state from " .. self.state .. " to " .. state)
 		self.state = state
+		self.lastStateUpdate = love.timer.getMicroTime()
 	end
 end
 
 function car:updateState()
 	local now = love.timer.getMicroTime()
-	-- print(self.name .. " last update " .. self.lastStateUpdate .. " now " .. now)
-	if now - self.lastStateUpdate < 2 then
-	return
+	if now - self.lastStateUpdate < 0.5 then
+		return
 	end
-	self.lastStateUpdate = now
 
-	local oldState = self.state
 	local r = math.random(0, 100)
 	if r < 20 then
 		self:changeState('fastdrive') -- 20%
@@ -61,6 +60,7 @@ function car:updateState()
 	else
 		self:changeState('halt') -- 10%
 	end
+	self.lastStateUpdate = now
 end
 
 function car:mergeList(one, another)
@@ -71,6 +71,9 @@ end
 
 function car:detectCollision(hitList)
 	self.hitList = {}
+	if self.state == 'reverse' then
+		return
+	end
 
 	local hitsForward = {}
 	local headingForward = vector (math.cos(self.angle), math.sin(self.angle))
@@ -83,7 +86,8 @@ function car:detectCollision(hitList)
 	-- If we have something in front of us we stop
 	if #hitsForward > 0 then
 		self:log("Front collision")
-		self:changeState('halt')
+		self:changeState('reverse')
+		return
 	end
 
 	local hitsLeft = {}
@@ -110,7 +114,7 @@ function car:detectCollision(hitList)
 		self:changeState('left')
 	elseif #hitsRight > 0 and #hitsLeft then
 		self:log("Left and right collision (" .. #hitsLeft .. ", " .. #hitsRight .. " right)")
-		self:changeState('halt')
+		self:changeState('reverse')
 	end
 	self:mergeList(self.hitList, hitsLeft)
 	self:mergeList(self.hitList, hitsRight)
@@ -123,6 +127,14 @@ function car:update(dt)
 	self:updateState()
 	self:detectCollision()
 
+	if self.state == 'left' then
+		self.angle_velocity = -4
+	elseif self.state == 'right' then
+		self.angle_velocity = 4
+	elseif self.state == 'reverse' then
+		self.angle_velocity = 1
+	end
+
 	local heading = vector (math.cos(self.angle), math.sin(self.angle))
 	self.velocity = heading * self.speed
 
@@ -134,12 +146,12 @@ function car:update(dt)
 		self.pos = self.pos + dt * self.velocity * 0.5
 	elseif self.state == 'halt' then
 		self.velocity = vector(0, 0)
-	end
+	elseif self.state == 'reverse' then
+		self.velocity = -0.2
 
-	if self.state == 'right' then
-		self.angle = self.angle - dt * self.angleRotateSide
-	elseif self.state == 'left' then
-		self.angle = self.angle + dt * self.angleRotateSide
+
+ * self.velocity
+		self.pos = self.pos + dt * self.velocity
 	end
 
 	self:updateToPhysics()

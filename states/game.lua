@@ -16,12 +16,18 @@ function st:beginContact (a, b, coll)
 	local entity_a = a:getUserData()
 	local entity_b = b:getUserData()
 
+	local a_x, a_y, b_x, b_y = vector(coll:getPositions())
+
+	local c_point = vector(a_x, a_y)
+	local c_normal = vector(coll:getNormal())
+	local c_velocity = entity_b.velocity - entity_a.velocity
+
 	if entity_a.beginContact ~= nil then
-		entity_a:beginContact (entity_b, coll)
+		entity_a:beginContact (entity_b, c_point, c_normal, c_velocity)
 	end
 
 	if entity_b.beginContact ~= nil then
-		entity_b:beginContact (entity_a, coll)
+		entity_b:beginContact (entity_a, c_point, c_normal * -1., c_velocity * -1.)
 	end
 end
 
