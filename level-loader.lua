@@ -74,7 +74,11 @@ return function(map_path, tile_info, tile_data)
 			local hex = ("%02x%02x%02x%02x"):format(image_data:getPixel(x,y))
 			local tile = tile_info[color_to_tile[hex]] or {}
 			if tile.name then
-				row[x+1] = quads[tile.name]
+				row[x+1] = {
+					q = quads[tile.name],
+					is_street   = tile.name:match('street^'),
+					is_sidewalk = tile.name:match('sidewalk^'),
+				}
 			end
 			if tile.is_rescue_zone then
 				map.rescue_zone.x = (x+1) * TW
@@ -135,8 +139,8 @@ return function(map_path, tile_info, tile_data)
 			local row = self[i]
 			for k = x0,x1+5 do
 				if row and row[k] then
-					local q = row[k]
-					love.graphics.drawq(self.atlas, q, (k-1)*TW, i*TH, 0, REF_W,REF_H)
+					local cell = row[k]
+					love.graphics.drawq(self.atlas, cell.q, (k-1)*TW, i*TH, 0, REF_W,REF_H)
 				end
 			end
 		end
@@ -146,9 +150,17 @@ return function(map_path, tile_info, tile_data)
 		return math.floor(x0/TW)+1, math.floor(y0/TH)+1
 	end
 
-	function map:tileAt(x,y)
+	function map:cell(x,y)
 		x,y = self:tileCoords(x,y)
 		return (map[y] or {})[x]
+	end
+
+	function map:isStreet(x,y)
+		return self:cell(x,y).is_street
+	end
+
+	function map:isSidewalk(x,y)
+		return self:cell(x,y).is_sidewalk
 	end
 
 	return map, geometry
