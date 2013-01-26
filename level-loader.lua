@@ -76,8 +76,8 @@ return function(map_path, tile_info, tile_data)
 			if tile.name then
 				row[x+1] = {
 					q = quads[tile.name],
-					is_street   = tile.name:match('street^'),
-					is_sidewalk = tile.name:match('sidewalk^'),
+					is_street   = tile.name:match('street$'),
+					is_sidewalk = tile.name:match('sidewalk$'),
 				}
 			end
 			if tile.is_rescue_zone then
@@ -156,7 +156,7 @@ return function(map_path, tile_info, tile_data)
 	end
 
 	function map:cell(i,k)
-		return (self[i] or {})[k] or {}
+		return (self[k] or {})[i] or {}
 	end
 
 	function map:cellAt(x,y)
