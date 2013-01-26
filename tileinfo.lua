@@ -23,5 +23,12 @@ return {
     {
         name = "hospital",
         is_collision_tile = true
+    },
+    {
+        name = "leftstreet"
+    },
+    {
+        name = "rightstreet"
     }
+    
 }
