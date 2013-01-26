@@ -2,8 +2,10 @@ local base_entity = class{name = "BaseEntity", function (self, pos, dimensions)
 	self.pos = pos:clone()
 	self.dimensions = dimensions:clone()
 	self.velocity = vector(0,0)
-	self.angle = 0.
-	self.angle_velocity = 0.
+	self.angle = 0
+	self.angle_velocity = 0
+	self.mass = self.mass or 0
+	self.physics = {}
 
 	--print ("adding base_entity")
 	Entities.add(self)
@@ -41,20 +43,24 @@ function base_entity:draw()
 
 end
 
-function base_entity:registerPhysics(world, mass)
-	self.physics = {}
-
+function base_entity:registerPhysics(world)
 	local physics_type = 'dynamic'
-	if mass == 0. then
+	if self.mass == 0 then
 		physics_type = 'static'
 	end
 
-	self.physics.body = love.physics.newBody (world, self.pos.x, self.pos.y  - self.dimensions.y, physics_type)
-	self.physics.shape = love.physics.newRectangleShape (0, 0, self.dimensions.x, self.dimensions.y)
+	self.physics.body  = self.physics.body or love.physics.newBody(world, self.pos.x, self.pos.y  - self.dimensions.y, physics_type)
+	self.physics.body:setLinearDamping (self.linear_damping or 10)
+	self.physics.body:setAngularDamping (self.linear_damping or 10)
 
-	self.physics.fixture = love.physics.newFixture (self.physics.body, self.physics.shape, 1)
+	self.physics.shape = self.physics.shape or love.physics.newRectangleShape(0, 0, self.dimensions.x, self.dimensions.y)
+
+	self.physics.fixture = self.physics.fixture or love.physics.newFixture(self.physics.body, self.physics.shape, 1)
 
 	self.physics.fixture:setUserData (self)
+
+	self.physics.body:setPosition (self.pos.x, self.pos.y)
+	self.physics.body:setAngle (self.angle)
 
 	self:updateToPhysics()
 end
@@ -71,10 +77,7 @@ end
 
 function base_entity:updateToPhysics()
 	if self.physics then
-		self.physics.body:setPosition (self.pos.x, self.pos.y)
-		self.physics.body:setAngle (self.angle)
 		self.physics.body:setAngularVelocity (self.angle_velocity)
-
 		self.physics.body:setLinearVelocity (self.velocity.x, self.velocity.y)
 	end
 end

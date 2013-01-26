@@ -12,16 +12,6 @@ function st:resetWorld()
 	print ("resetting world")
 end
 
-function st:addObstacle(pos, dimensions)
-	local obstacle = Entity.obstacle (pos, dimensions)
-	obstacle:registerPhysics (self.world, 0.)
-end
-
-function st:addPedestrian(pos, angle)
-	local pedestrian = Entity.pedestrian (pos, angle)
-	pedestrian:registerPhysics(self.world, 1.)
-end
-
 function st:beginContact (a, b, coll)
 	local entity_a = a:getUserData()
 	local entity_b = b:getUserData()
@@ -48,45 +38,70 @@ function st:endContact (a, b, coll)
 	end
 end
 
+local map, geometry
 function st:init()
-	print ("State.game.init()")
+	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
+end
+
+function st:enter()
 	self:resetWorld()
 
-	self.player = Entity.player (vector(40, 100))
-	self.player:registerPhysics (self.world, 1.)
+	self.player = Entity.player(vector(40, 100))
 
-        self.cars = {}
-        for i = 1,30 do
-            local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
-            local car = Entity.car (pos, math.random(0,3.1415), "car" .. i)
-            car:registerPhysics (self.world, 1.)
-            table.insert(self.cars, car)
-        end
+	for i = 1,30 do
+		local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
+		Entity.car(pos, math.random(0,3.1415), "car" .. i)
+	end
 
-	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	cam = Camera()
     cam.scale = 2
 	for rect in pairs(geometry) do
-		self:addObstacle (vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
+		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
+	Entity.pedestrian(vector(100, 100), 0)
 
-	self:addPedestrian (vector(100, 100), 0 )
+	self.marker = Entity.questmarker(vector(-100,-100))
+	Entities.registerPhysics(self.world)
+
+	self.pickup_progress = 0
+	Signal.register('victim-picked-up', function() print("YAY!") self.pickup_progress = 0 end)
+	Signal.register('victim-pickup-timer', function(progress) self.pickup_progress = progress end)
+	Signal.register('victim-pickup-abort', function() self.pickup_progress = 0 end)
 end
 
 function st:leave()
+	Signal.clear('victim-picked-up', 'victim-pickup-timer', 'victim-pickup-abort')
+	Entities.clear()
+	self.player = nil
 end
 
 function st:draw()
 	cam:attach()
-
-	love.graphics.setFont(Font[30])
-	love.graphics.printf("GAME", 0,SCREEN_HEIGHT/4-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-
 	map:draw(cam)
-
 	Entities.draw()
 
+	local ppos = vector(self.player.physics.body:getPosition())
+	local qpos = vector(self.marker.physics.body:getPosition())
+	local dir  = (qpos - ppos):normalize_inplace()
+
+	-- TODO: this in pretty
+	love.graphics.setLine(5, 'smooth')
+	love.graphics.setColor(255,100,100)
+	love.graphics.line(ppos.x+dir.x*40, ppos.y+dir.y*40, (ppos+dir*60):unpack())
+	love.graphics.setColor(255,255,255)
+	love.graphics.setLine(1, 'rough')
+
 	cam:detach()
+
+	if self.pickup_progress > 0 then
+		local p = self.pickup_progress
+		love.graphics.setColor((1-p)*200+55,p*200+55,55)
+		love.graphics.setLine(2, 'smooth')
+		love.graphics.rectangle('line', 10,SCREEN_HEIGHT-40, SCREEN_WIDTH-20, 30)
+		love.graphics.rectangle('fill', 14,SCREEN_HEIGHT-36, p*(SCREEN_WIDTH-28), 22)
+		love.graphics.setLine(1, 'rough')
+		love.graphics.setColor(255,255,255)
+	end
 end
 
 local timeslice = 0
