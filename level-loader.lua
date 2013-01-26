@@ -118,7 +118,8 @@ return function(map_path, tile_info, tile_data)
 	end
 
 	-- map drawing
-	function map:draw(cam)
+	function map:draw(cam, overdraw)
+		overdraw = overdraw or 5
 		-- rotated bounding box
 		local xul,yul = cam:worldCoords(0,0)
 		local xll,yll = cam:worldCoords(0, SCREEN_HEIGHT)
@@ -133,11 +134,11 @@ return function(map_path, tile_info, tile_data)
 		x0,y0 = math.floor(x0/TW)+1, math.floor(y0/TH)+1
 		x1,y1 = math.ceil(x1/TW)+1, math.ceil(y1/TH)+1
 
-		x0,y0 = math.max(1, x0-5), math.max(1, y0-5)
+		x0,y0 = math.max(1, x0-overdraw), math.max(1, y0-overdraw)
 
-		for i = y0,y1+5 do
+		for i = y0,y1+overdraw do
 			local row = self[i]
-			for k = x0,x1+5 do
+			for k = x0,x1+overdraw do
 				if row and row[k] then
 					local cell = row[k]
 					love.graphics.drawq(self.atlas, cell.q, (k-1)*TW, i*TH, 0, REF_W,REF_H)
@@ -150,9 +151,12 @@ return function(map_path, tile_info, tile_data)
 		return math.floor(x0/TW)+1, math.floor(y0/TH)+1
 	end
 
-	function map:cell(x,y)
-		x,y = self:tileCoords(x,y)
-		return (map[y] or {})[x]
+	function map:cell(i,k)
+		return (map[i] or {})[k]
+	end
+
+	function map:cellAt(x,y)
+		return self:cell( self:tileCoords(x,y) )
 	end
 
 	function map:isStreet(x,y)
