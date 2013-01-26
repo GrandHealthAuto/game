@@ -32,7 +32,6 @@ function st:init()
 end
 
 function st:leave()
-	self.player = nil
 end
 
 function st:draw()
@@ -55,38 +54,6 @@ function st:update(dt)
 	end
 
 	Entities.update(dt)
-end
-
-function st:keypressed(key)
-	if key == 'escape' then
-		GS.switch (State.menu)
-	end
-
-	if self.player then
-		if key == 'up' then
-			self.player:accelerate(true)
-		elseif key == 'down' then
-			self.player:reverse(true)
-		elseif key == 'left' then
-			self.player:turn_left(true)
-		elseif key == 'right' then
-			self.player:turn_right(true)
-		end
-	end
-end
-
-function st:keyreleased(key)
-	if self.player then
-		if key == 'up' then
-			self.player:accelerate(nil)
-		elseif key == 'down' then
-			self.player:reverse(nil)
-		elseif key == 'left' then
-			self.player:turn_left(nil)
-		elseif key == 'right' then
-			self.player:turn_right(nil)
-		end
-	end
 end
 
 return st

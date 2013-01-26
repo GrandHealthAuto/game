@@ -6,6 +6,7 @@ GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
 Entities   = require 'entities'
 BaseEntity = require 'entities.BaseEntity'
+Input      = require 'input'
 
 require 'slam'
 
@@ -126,9 +127,15 @@ function love.load()
 	GS.switch(State.menu)
 
 	love.physics.setMeter (32)
+
+	Input.bind{name = 'left',  key = {'left',  'a'}}
+	Input.bind{name = 'right', key = {'right', 'd'}}
+	Input.bind{name = 'up',    key = {'up',    'w'}}
+	Input.bind{name = 'down',  key = {'down',  's'}}
 end
 
 function love.update(dt)
+	Input.update()
 	Timer.update(dt)
 end
 

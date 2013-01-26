@@ -2,8 +2,6 @@ local player = class{inherits = BaseEntity,
 	function (self, pos, dimensions)
 		BaseEntity.construct (self, pos, dimensions)
 		self.visual = Image.ambulance
-
-		self.controls = {}
 	end
 }
 
@@ -14,21 +12,17 @@ function player:update(dt)
 
 	self.velocity = vector (0, 0)
 
-	if self.controls.accelerate then
+	if Input.isDown('up') then
 		self.velocity = heading * 128
-	end
-
-	if self.controls.reverse then
+	elseif Input.isDown('down') then
 		self.velocity = heading * -16
 	end
 
 	self.angle_velocity = 0
 
-	if self.controls.left then
+	if Input.isDown('left') then
 		self.angle_velocity = -5
-	end
-
-	if self.controls.right then
+	elseif Input.isDown('right') then
 		self.angle_velocity = 5
 	end
 
@@ -36,22 +30,6 @@ function player:update(dt)
 	self.angle = self.angle + dt * self.angle_velocity
 
 	self:updateToPhysics()
-end
-
-function player:accelerate(state)
-	self.controls.accelerate = state
-end
-
-function player:reverse(state)
-	self.controls.reverse = state
-end
-
-function player:turn_left(state)
-	self.controls.left = state
-end
-
-function player:turn_right(state)
-	self.controls.right = state
 end
 
 return player
