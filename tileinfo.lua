@@ -19,5 +19,9 @@ return {
         is_collision_tile = true,
     },
     {
+    },
+    {
+        name = "hospital",
+        is_collision_tile = true
     }
 }
