@@ -52,7 +52,7 @@ end
 function st:enter()
 	self:resetWorld()
 
-	self.player = Entity.player(vector(40, 100))
+	self.player = Entity.player(map.rescue_zone)
 
 	self.pedestrians = {}
 	for i = 1,30 do
@@ -69,23 +69,24 @@ function st:enter()
 	end
 	Entity.pedestrian(vector(100, 100), 0)
 
-	self.victim_on_board = false
-	self.marker = Entity.questmarker(vector(-100,-100))
+	self.marker = Entity.questmarker(map.rescue_zone)
 	Entities.registerPhysics(self.world)
 
 	self.pickup_progress = 0
+	self.victim_on_board = false
 	Signal.register('victim-picked-up', function()
+		self.pickup_progress = 0
 		if self.victim_on_board then
 			-- delivered at hospital
+			self.marker.physics.body:setPosition(map.rescue_zone:unpack())
 			self.victim_on_board = false
-			self.marker = Entity.questmarker(map.rescue_zone)
 		else
 			-- victim picked up
 			self.victim_on_board = true
 			-- TODO: next victim
-			self.marker = Entity.questmarker(vector(math.random(0,0, #map[1]*32, #map*32)))
+			self.marker.physics.body:setPosition(math.random(0, #map[1]*32), math.random(#map*32))t
 		end
-		self.pickup_progress = 0
+		self.marker:updateFromPhysics()
 	end)
 	Signal.register('victim-pickup-timer', function(progress)
 		self.pickup_progress = progress
@@ -93,6 +94,8 @@ function st:enter()
 	Signal.register('victim-pickup-abort', function()
 		self.pickup_progress = 0
 	end)
+
+	Signal.emit('victim-picked-up')
 end
 
 function st:leave()
@@ -106,16 +109,18 @@ function st:draw()
 	map:draw(cam)
 	Entities.draw()
 
-	local ppos = vector(self.player.physics.body:getPosition())
-	local qpos = vector(self.marker.physics.body:getPosition())
-	local dir  = (qpos - ppos):normalize_inplace()
+	if self.marker then
+		local ppos = vector(self.player.physics.body:getPosition())
+		local qpos = vector(self.marker.physics.body:getPosition())
+		local dir  = (qpos - ppos):normalize_inplace()
 
-	-- TODO: this in pretty
-	love.graphics.setLine(5, 'smooth')
-	love.graphics.setColor(255,100,100)
-	love.graphics.line(ppos.x+dir.x*40, ppos.y+dir.y*40, (ppos+dir*60):unpack())
-	love.graphics.setColor(255,255,255)
-	love.graphics.setLine(1, 'rough')
+		-- TODO: this in pretty
+		love.graphics.setLine(5, 'smooth')
+		love.graphics.setColor(255,100,100)
+		love.graphics.line(ppos.x+dir.x*40, ppos.y+dir.y*40, (ppos+dir*60):unpack())
+		love.graphics.setColor(255,255,255)
+		love.graphics.setLine(1, 'rough')
+	end
 
 	cam:detach()
 
