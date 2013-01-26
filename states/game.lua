@@ -78,7 +78,6 @@ function st:enter()
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
-	Entity.pedestrian(vector(100, 100), 0)
 
 	self.marker = Entity.questmarker(map.rescue_zone)
 

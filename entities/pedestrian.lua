@@ -6,14 +6,14 @@ local pedestrian = class{name = "Pedestrian", inherits = Entity.BaseEntity,
 		self.angle = angle
 		self.shape_offset = vector(7,0)
 
-		self.speed = 60
+		self.speed = 96
 		self.state = 'walk'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
 
 		self.angleSpeed = 10
-		self.rayCastLengthForward = 35
-		self.rayCastLengthSide = 20
+		self.rayCastLengthForward = 20
+		self.rayCastLengthSide = 15
 		self.rayCastAngleSide = 3.14159 / 4 -- 45°
 
 		self.hitList = {}
@@ -46,20 +46,16 @@ function pedestrian:updateState()
 		return
 	end
 
-	local r = math.random(0, 100)
-	if r < 20 then
-		self:changeState('walkFast') -- 20%
-	elseif r < 60 then
-		self:changeState('walk') -- 40%
-	elseif r < 70 then
-		self:changeState('walkSlow') -- 10%
-	elseif r < 80 then
-		self:changeState('left') -- 10%
-	elseif r < 90 then
-		self:changeState('right') -- 10%
+	local r = math.random()
+
+	if r > 0.8 then
+		self:changeState ('stop')
+	elseif r > 0.6 then
+		self:changeState ('walkFast')
 	else
-		self:changeState('stop') -- 10%
+		self:changeState ('walk')
 	end
+
 	self.lastStateUpdate = now
 end
 
@@ -71,36 +67,47 @@ end
 
 function pedestrian:detectCollision(hitList)
 	self.hitList = {}
-	if self.state == 'reverse' then
-		return
-	end
 
 	local hitsForward = {}
 	local headingForward = vector (math.cos(self.angle), math.sin(self.angle))
-	local ray = self.pos + headingForward * self.rayCastLengthForward
-	State.game.world:rayCast(self.pos.x, self.pos.y, ray.x, ray.y, function (fixture, x, y, xn, yn, fraction)
+	local ray_start = self.pos + headingForward * 4.5
+	local ray = self.pos + headingForward * self.rayCastLengthForward 
+
+	self:log ("ray_start: " .. tostring (ray_start) .. " ray: " .. tostring(ray - ray_start))
+
+	State.game.world:rayCast(ray_start.x, ray_start.y, ray.x, ray.y, function (fixture, x, y, xn, yn, fraction)
 		return self:worldRayCastCallback(fixture, x, y, xn, yn, fraction, hitsForward)
 	end )
 	self:mergeList(self.hitList, hitsForward)
 
 	-- If we have something in front of us we stop
 	if #hitsForward > 0 then
-		self:log("Front collision")
-		self:changeState('reverse')
+		self:log("Front collision: " .. tostring(#hitsForward))
+		if self.state == 'walkFast' then
+			self:changeState ('walk')
+		elseif self.state == 'walk' then
+			self:changeState ('walkSlow')
+		elseif self.state == 'walkSlow' then
+			if math.random() > 0.5 then
+				self:changeState ('left')
+			else 
+				self:changeState ('right')
+			end
+		end
 		return
 	end
 
 	local hitsLeft = {}
 	local headingLeft = vector (math.cos(self.angle - self.rayCastAngleSide), math.sin(self.angle - self.rayCastAngleSide))
-	local ray = self.pos + headingLeft * self.rayCastLengthSide
-	State.game.world:rayCast(self.pos.x, self.pos.y, ray.x, ray.y, function (fixture, x, y, xn, yn, fraction)
+	local ray = ray_start + headingLeft * self.rayCastLengthSide
+	State.game.world:rayCast(ray_start.x, ray_start.y, ray.x, ray.y, function (fixture, x, y, xn, yn, fraction)
 		return self:worldRayCastCallback(fixture, x, y, xn, yn, fraction, hitsLeft)
 	end )
 
 	local hitsRight = {}
 	local headingRight = vector (math.cos(self.angle + self.rayCastAngleSide), math.sin(self.angle + self.rayCastAngleSide))
-	local ray = self.pos + headingRight * self.rayCastLengthSide
-	State.game.world:rayCast(self.pos.x, self.pos.y, ray.x, ray.y, function (fixture, x, y, xn, yn, fraction)
+	local ray = ray_start + headingRight * self.rayCastLengthSide
+	State.game.world:rayCast(ray_start.x, ray_start.y, ray.x, ray.y, function (fixture, x, y, xn, yn, fraction)
 		return self:worldRayCastCallback(fixture, x, y, xn, yn, fraction, hitsRight)
 	end )
 
@@ -115,9 +122,12 @@ function pedestrian:detectCollision(hitList)
 	elseif #hitsRight > 0 and #hitsLeft then
 		self:log("Left and right collision (" .. #hitsLeft .. ", " .. #hitsRight .. " right)")
 		self:changeState('reverse')
+	elseif #hitsRight == 0 and #hitsLeft == 0 then
+		self:changeState('walk')
 	end
 	self:mergeList(self.hitList, hitsLeft)
 	self:mergeList(self.hitList, hitsRight)
+	--]]
 end
 
 function pedestrian:update(dt)
@@ -127,28 +137,32 @@ function pedestrian:update(dt)
 	self:updateState()
 	self:detectCollision()
 
+	self.angle_velocity = 0 
 	if self.state == 'left' then
 		self.angle_velocity = -4
 	elseif self.state == 'right' then
 		self.angle_velocity = 4
 	elseif self.state == 'reverse' then
-		self.angle_velocity = 1
+		self.angle_velocity = 0 
 	end
 
 	local heading = vector (math.cos(self.angle), math.sin(self.angle))
-	self.velocity = heading * self.speed
+	self.velocity = vector(0, 0)
 
 	if self.state == 'walkFast' then
-		self.pos = self.pos + dt * self.velocity * 2
+		self.velocity = heading * self.speed * 2.
 	elseif self.state == 'walk' then
-		self.pos = self.pos + dt * self.velocity
+		self.velocity = heading * self.speed
 	elseif self.state == 'walkSlow' then
-		self.pos = self.pos + dt * self.velocity * 0.5
+		self.velocity = heading * self.speed * 0.8
 	elseif self.state == 'stop' then
 		self.velocity = vector(0, 0)
 	elseif self.state == 'reverse' then
-		self.velocity = -0.2 * self.velocity
-		self.pos = self.pos + dt * self.velocity
+		self.velocity = heading * self.speed * -0.2
+	end
+
+	if (self.name) then
+		self:log ("[" .. self.name .. "]: " .. self.state .. " velocity = " .. tostring(self.velocity))
 	end
 
 	self:updateToPhysics()
@@ -189,7 +203,7 @@ end
 function pedestrian:log(msg)
 	if self.debug then
 		local now = love.timer.getMicroTime()
-		print(now .. " " .. self.name .. ": " .. msg)
+		print(now .. " " .. (self.name or "unnamed") .. ": " .. msg)
 	end
 end
 
