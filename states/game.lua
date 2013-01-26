@@ -4,6 +4,11 @@ st.world = {}
 
 function st:resetWorld()
 	st.world = love.physics.newWorld()
+
+	st.world:setCallbacks (
+		function(a, b, coll) self:beginContact (a, b, coll) end,
+		function(a, b, coll) self:endContact (a, b, coll) end
+		)
 	print ("resetting world")
 end
 
@@ -12,11 +17,34 @@ function st:addObstacle(pos, dimensions)
 	obstacle:registerPhysics (self.world, 0.)
 end
 
+function st:addPedestrian(pos, angle)
+	local pedestrian = Entity.pedestrian (pos, angle)
+	pedestrian:registerPhysics(self.world, 1.)
+end
+
+function st:beginContact (a, b, coll)
+	local entity_a = a:getUserData()
+	local entity_b = b:getUserData()
+
+--	print ("entity_a = " .. tostring (entity_a))
+
+	if a.collide ~= nil then
+		a:collide (entity_b, coll)
+	end
+
+	if b.collide ~= nil then
+		b:collide (entity_a, coll)
+	end
+end
+
+function st:endContact (a, b, coll)
+end
+
 function st:init()
 	print ("State.game.init()")
 	self:resetWorld()
 
-	self.player = Entity.player (vector(40, 100), vector(32, 32))
+	self.player = Entity.player (vector(40, 100), vector(32, 24))
 	self.player:registerPhysics (self.world, 1.)
 
         self.cars = {}
@@ -33,6 +61,8 @@ function st:init()
 	for rect in pairs(geometry) do
 		self:addObstacle (vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
+
+	self:addPedestrian (vector(100, 100), 0 )
 end
 
 function st:leave()

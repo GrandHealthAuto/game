@@ -10,6 +10,11 @@ Tween      = require "tween"
 
 require 'slam'
 
+-- evil global variables
+GVAR = {
+	draw_collision_boxes = false
+}
+
 function serialize(t, indent)
 	indent = "  " or indent
 	for k,v in pairs(t) do

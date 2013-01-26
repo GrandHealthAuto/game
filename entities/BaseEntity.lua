@@ -11,22 +11,30 @@ end
 }
 
 function base_entity:draw()
+	if GVAR.draw_collision_boxes or self.visual == nil then
+		love.graphics.push()
+		love.graphics.translate (self.pos.x, self.pos.y)
+		love.graphics.rotate (self.angle)
+		love.graphics.scale (self.dimensions.x, self.dimensions.y)
+		love.graphics.rectangle (
+		'fill',
+		- 0.5,
+		- 0.5,
+		1,
+	  1	
+		)
+		love.graphics.pop()
+	end
+
 	if self.visual then
 		love.graphics.draw (
 		self.visual,
 		self.pos.x, self.pos.y, self.angle,
 		1, 1,
-		self.dimensions.x * 0.5, self.dimensions.y * 0.5
-		)
-	else
-		love.graphics.rectangle (
-		'line',
-		self.pos.x - self.dimensions.x * 0.5,
-		self.pos.y - self.dimensions.y * 0.5,
-		self.dimensions.x,
-		self.dimensions.y
+		self.visual:getWidth() * 0.5, self.visual:getHeight() * 0.5 
 		)
 	end
+
 end
 
 function base_entity:registerPhysics(world, mass)
@@ -37,10 +45,12 @@ function base_entity:registerPhysics(world, mass)
 		physics_type = 'static'
 	end
 
-	self.physics.body = love.physics.newBody (world, self.pos.x, self.pos.y, physics_type)
-	self.physics.shape = love.physics.newRectangleShape (self.dimensions.x, self.dimensions.y)
+	self.physics.body = love.physics.newBody (world, self.pos.x, self.pos.y  - self.dimensions.y, physics_type)
+	self.physics.shape = love.physics.newRectangleShape (0, 0, self.dimensions.x, self.dimensions.y)
 
 	self.physics.fixture = love.physics.newFixture (self.physics.body, self.physics.shape, 1)
+
+	self.physics.fixture:setUserData (self)
 
 	self:updateToPhysics()
 end

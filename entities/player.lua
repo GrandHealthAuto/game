@@ -32,4 +32,8 @@ function player:update(dt)
 	self:updateToPhysics()
 end
 
+function player:collide (other, coll)
+	print ("player is colliding")
+end
+
 return player
