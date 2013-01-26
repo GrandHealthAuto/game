@@ -63,6 +63,7 @@ function base_entity:updateFromPhysics()
 	if self.physics then
 		self.pos.x, self.pos.y = self.physics.body:getPosition()
 		self.angle = self.physics.body:getAngle()
+		self.angle_velocity = self.physics.body:getAngularVelocity()
 
 		self.velocity.x, self.velocity.y = self.physics.body:getLinearVelocity()
 	end
@@ -72,7 +73,7 @@ function base_entity:updateToPhysics()
 	if self.physics then
 		self.physics.body:setPosition (self.pos.x, self.pos.y)
 		self.physics.body:setAngle (self.angle)
-		self.physics.body:setAngularVelocity (0)
+		self.physics.body:setAngularVelocity (self.angle_velocity)
 
 		self.physics.body:setLinearVelocity (self.velocity.x, self.velocity.y)
 	end

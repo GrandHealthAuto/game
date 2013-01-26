@@ -26,9 +26,6 @@ function player:update(dt)
 		self.angle_velocity = 5
 	end
 
-	self.pos = self.pos + dt * self.velocity	
-	self.angle = self.angle + dt * self.angle_velocity
-
 	self:updateToPhysics()
 end
 
