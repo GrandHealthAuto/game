@@ -1,3 +1,5 @@
+highscore = require "highscore"
+
 local st = GS.new()
 
 st.world = {}
