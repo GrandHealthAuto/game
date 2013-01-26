@@ -6,6 +6,7 @@ GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
 Entities   = require 'entities'
 Input      = require 'input'
+Tween      = require "tween"
 
 require 'slam'
 
@@ -127,21 +128,21 @@ function love.load()
 
 	love.physics.setMeter (32)
 
-	Input.bind{name = 'left',  key = {'left',  'a'}}
-	Input.bind{name = 'right', key = {'right', 'd'}}
-	Input.bind{name = 'up',    key = {'up',    'w'}}
-	Input.bind{name = 'down',  key = {'down',  's'}}
+	Input.bind{name = 'left',   key = {'left',  'a'}}
+	Input.bind{name = 'right',  key = {'right', 'd'}}
+	Input.bind{name = 'up',     key = {'up',    'w'}}
+	Input.bind{name = 'down',   key = {'down',  's'}}
+	Input.bind{name = 'action', key = {' ', 'enter', 'return'}}
 end
 
 function love.update(dt)
 	Input.update()
 	Timer.update(dt)
+	Tween.update(dt)
 end
 
 function love.keypressed(key)
-	if key == 'return' then
-		GS.switch (State.game)
-	elseif key == 'escape' then
+	if key == 'escape' then
 		local continue
 		continue = Interrupt{
 			draw = function(draw)
@@ -164,4 +165,12 @@ function love.keypressed(key)
 			end,
 		}
 	end
+end
+
+function Input.mappingDown(mapping, mag)
+	GS.mappingDown(mapping, mag)
+end
+
+function Input.mappingUp(mapping, mag)
+	GS.mappingUp(mapping, mag)
 end
