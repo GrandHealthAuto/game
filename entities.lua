@@ -11,9 +11,17 @@ local function add(entity)
 	entities[entity] = assert(entity, "No entity to add")
 end
 
-local function remove(entity)
+local function remove(entity, ...)
 	assert(entity, "No entity to remove")
 	entities[entity] = nil
+	(entity.onDelete or _NOP_)(entity, ...)
+end
+
+local function clear(...)
+	for e in pairs(entities) do
+		(e.onDelete or _NOP_)(e, ...)
+		entities[e] = nil
+	end
 end
 
 -- Usage:
