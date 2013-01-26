@@ -106,7 +106,27 @@ function player:update(dt)
 	self.motorspeed = speed / GVAR["player_motor_sound_maxspeed"]
 	self.runningsfx:setPitch(0.5 + self.motorspeed*0.5)
 	self.runningsfx:setVolume(0.05 + self.motorspeed*0.5)
-	
+
+	local angle_clamp = 0.05
+
+	if self.angle < 0 then
+		self.angle = self.angle + math.pi * 2
+	elseif self.angle > math.pi * 2 then
+		self.angle = self.angle - math.pi * 2
+	end
+
+	if math.abs(self.angle) < angle_clamp then
+		self.angle = 0.
+	elseif math.abs(self.angle - math.pi * 0.5) < angle_clamp then
+		self.angle = math.pi * 0.5
+	elseif math.abs(self.angle - math.pi) < angle_clamp then
+		self.angle = math.pi
+	elseif math.abs(self.angle - math.pi * 1.5) < angle_clamp then
+		self.angle = math.pi * 1.5
+	elseif math.abs(self.angle - math.pi * 2.) < angle_clamp then
+		self.angle = math.pi * 2. 
+	end
+
 	self:updateToPhysics()
 end
 
