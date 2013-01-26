@@ -69,7 +69,7 @@ function st:enter()
 	-- test pedestrian
 	local pedestrian = Entity.pedestrian (vector(2580, 3120) , 0., "Crash Dummy")
 	table.insert(self.pedestrians, pedestrian)
-	local car = Entity.car (vector(map.rescue_zone.x - 100,map.rescue_zone.y), 0, "Car ")
+	local car = Entity.car (vector(map.rescue_zone.x - 300, map.rescue_zone.y + 25), 0, "Car ")
 
 	cam = Camera()
 	cam.scale = 1
