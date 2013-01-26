@@ -44,13 +44,13 @@ function st:init()
 	print ("State.game.init()")
 	self:resetWorld()
 
-	self.player = Entity.player (vector(40, 100), vector(32, 24))
+	self.player = Entity.player (vector(40, 100))
 	self.player:registerPhysics (self.world, 1.)
 
         self.cars = {}
         for i = 1,30 do
             local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
-            local car = Entity.car (pos, vector(32, 32))
+            local car = Entity.car (pos)
             car.angle = math.random(0, 3.1415)
             table.insert(self.cars, car)
         end

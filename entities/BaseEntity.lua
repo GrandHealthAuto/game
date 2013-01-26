@@ -12,18 +12,22 @@ end
 
 function base_entity:draw()
 	if GVAR.draw_collision_boxes or self.visual == nil then
+		old_color = { love.graphics.getColor() }
+
+		love.graphics.setColor(255, 0., 0., 255)
 		love.graphics.push()
 		love.graphics.translate (self.pos.x, self.pos.y)
 		love.graphics.rotate (self.angle)
-		love.graphics.scale (self.dimensions.x, self.dimensions.y)
 		love.graphics.rectangle (
-		'fill',
-		- 0.5,
-		- 0.5,
-		1,
-	  1	
+		'line',
+		- self.dimensions.x * 0.5,
+		- self.dimensions.y * 0.5,
+		self.dimensions.x,
+	  self.dimensions.y
 		)
 		love.graphics.pop()
+
+		love.graphics.setColor(old_color)
 	end
 
 	if self.visual then

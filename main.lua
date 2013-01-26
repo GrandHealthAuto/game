@@ -12,7 +12,7 @@ require 'slam'
 
 -- evil global variables
 GVAR = {
-	draw_collision_boxes = false
+	draw_collision_boxes = true
 }
 
 function serialize(t, indent)
