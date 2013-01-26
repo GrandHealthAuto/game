@@ -84,7 +84,7 @@ function st:enter()
 			-- victim picked up
 			self.victim_on_board = true
 			-- TODO: next victim
-			self.marker.physics.body:setPosition(math.random(0, #map[1]*32), math.random(#map*32))t
+			self.marker.physics.body:setPosition(math.random(0, #map[1]*32), math.random(#map*32))
 		end
 		self.marker:updateFromPhysics()
 	end)
