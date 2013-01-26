@@ -68,6 +68,7 @@ function player:update(dt)
 		end
 
 		self.angle_velocity = - self.angle_velocity
+		rotation_speed_factor = rotation_speed_factor * -1.
 	end
 
 	if Input.isDown('right') then
