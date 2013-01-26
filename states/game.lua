@@ -54,6 +54,19 @@ function st:init()
 	self.map = map
 end
 
+function st:getStreetPos()
+	local w = map.width
+	local h = map.height
+	for i = 0, 100 do
+		local x = math.floor(math.random(0, w))
+		local y = math.floor(math.random(0, h))
+		if map:isStreet(x, y) then
+			return map:mapCoordsCenter(x, y)
+		end
+	end
+	return map:mapCoordsCenter(math.floor(math.random(0, w)), math.floor(math.random(0, h)))
+end
+
 function st:enter()
 	self:resetWorld()
 
@@ -66,10 +79,14 @@ function st:enter()
 		table.insert(self.pedestrians, pedestrian)
 	end
 
-	for i = 1,50 do
-		local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT))
-		-- local car = Entity.car (pos, 0, "Car ")
+	for i = 1,80 do
+		local pos = vector(math.random(0,160 * 32), math.random(0,160 * 32))
+		pos = self:getStreetPos()
+		local car = Entity.car (vector(map.rescue_zone.x + i * 100, map.rescue_zone.y + 30), 0, "Car " .. i)
+		--car.direction = 'east'
+		--car.angle = math.pi - math.random(0,1) + 0.5
 		local car = Entity.car (pos, 0, "Car " .. i)
+		--car:log(car.pos.x .. "," .. car.pos.y .. " " .. car.targetPos.x .. "," .. car.targetPos.y)
 	end
 
 	cam = Camera()
