@@ -19,6 +19,14 @@ function st:init()
 	self.player = Entity.player (vector(40, 100), vector(32, 32))
 	self.player:registerPhysics (self.world, 1.)
 
+        self.cars = {}
+        for i = 1,30 do
+            local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
+            local car = Entity.car (pos, vector(32, 32))
+            car.angle = math.random(0, 3.1415)
+            table.insert(self.cars, car)
+        end
+
 	map, geometry = (require 'level-loader')('map.png', {
 		width = 32, height = 32, {name = 'foo'}, {name = 'foo', is_collision_tile = true}
 	}, {texture = 'tiles.png', frames = {
