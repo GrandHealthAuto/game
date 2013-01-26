@@ -54,11 +54,11 @@ function st:enter()
 
 	self.player = Entity.player(vector(40, 100))
 
-	self.cars = {}
+	self.pedestrians = {}
 	for i = 1,30 do
 		local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT))
-		local car = Entity.car (pos, math.random(0,3.1415), "car" .. i)
-		table.insert(self.cars, car)
+		local pedestrian = Entity.pedestrian (pos, math.random(0,3.1415), "Person " .. i)
+		table.insert(self.pedestrians, pedestrian)
 	end
 
 	cam = Camera()
