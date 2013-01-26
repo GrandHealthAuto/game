@@ -8,9 +8,9 @@ local mouse_hot, mouse_x, mouse_y
 local hsData = nil
 
 function st:enter()
+	offset = 0
 	mouse_hot, mouse_x, mouse_y = nil, nil, nil
 	hsData = hs:getHighscore(offset)
-
 end
 
 function st:update(dt)
