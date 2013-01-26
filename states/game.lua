@@ -92,7 +92,7 @@ function st:enter()
 end
 
 function st:leave()
-	Signal.clear('victim-picked-up', 'victim-pickup-timer', 'victim-pickup-abort')
+	Signal.clear()
 	Entities.clear()
 	self.player = nil
 end
@@ -119,7 +119,7 @@ function st:draw()
 
 	if self.pickup_progress > 0 then
 		local p = self.pickup_progress
-		love.graphics.setColor((1-p)*200+55,p*200+55,55)
+		love.graphics.setColor((1-p*p)*200 + 55,p*200+55,55)
 		love.graphics.setLine(2, 'smooth')
 		love.graphics.rectangle('line', 10,SCREEN_HEIGHT-40, SCREEN_WIDTH-20, 30)
 		love.graphics.rectangle('fill', 14,SCREEN_HEIGHT-36, p*(SCREEN_WIDTH-28), 22)
