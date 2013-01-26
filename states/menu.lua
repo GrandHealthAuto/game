@@ -15,7 +15,8 @@ function st:update(dt)
     Gui.group.push{grow = "down", pos={SCREEN_WIDTH/2-Gui.group.default.size[1]/2,SCREEN_HEIGHT/2}}
     if Gui.Button{text="Start"} then
     end
-    if Gui.Button{text="Stats"} then
+    if Gui.Button{text="Highscore"} then
+		GS.switch(State.highscore)
     end
     if Gui.Button{text="Options"} then
     end
