@@ -147,6 +147,9 @@ return function(map_path, tile_info, tile_data)
 		end
 	end
 
+	map.width  = image_data:getWidth()
+	map.height = image_data:getHeight()-1
+
 	function map:tileCoords(x,y)
 		return math.floor(x/TW) + 1, math.floor(y/TH)
 	end
