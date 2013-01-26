@@ -54,19 +54,29 @@ function player:update(dt)
 
 	local rotation_speed_factor = math.min (speed, 320) / 320
 
+	-- 
+	if speed > 300 then
+		self.physics.body:setLinearDamping (0.08 * 32)
+	elseif speed > 200 then
+		self.physics.body:setLinearDamping (0.10 * 32)
+	elseif speed > 150 then
+		self.physics.body:setLinearDamping (0.15 * 32)
+	else
+		self.physics.body:setLinearDamping (GVAR["player_linear_damping"])
+	end
+
 	if Input.isDown('accelerate') then
 		self.angle_velocity = 0.
 
 		if speed < GVAR["player_accel_max_speed"] then
-			local drag_penalty = 1.
-
-			if speed + dt * GVAR["player_accel"] > GVAR["player_accel_max_speed"] then
-				drag_penalty = (GVAR["player_accel_max_speed"] - speed) / (dt * math.abs(GVAR["player_accel"]))
-			end
-
-			acceleration = heading * GVAR["player_accel"] * drag_penalty
+			acceleration = heading * GVAR["player_accel"] * 1. 
+		else
+			print ("superspeed")
+			acceleration = heading * GVAR["player_accel"] * 1.
 		end
 	end
+
+--	print (speed)
 
 	if Input.isDown('decelerate') then
 		if speed < GVAR["player_reverse_max_speed"] then
@@ -93,7 +103,7 @@ function player:update(dt)
 
 	self.velocity = self.velocity + dt * acceleration
 	
-	self.motorspeed = speed / GVAR["player_accel_max_speed"]
+	self.motorspeed = speed / GVAR["player_motor_sound_maxspeed"]
 	self.runningsfx:setPitch(0.5 + self.motorspeed*0.5)
 	self.runningsfx:setVolume(0.05 + self.motorspeed*0.5)
 	
