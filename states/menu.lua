@@ -4,7 +4,8 @@ local Gui = require "Quickie"
 
 local st = GS.new()
 function st:enter()
-    Gui.group.default.size[1] = 150
+    Gui.core.style = require 'gui.style'
+    Gui.group.default.size[1] = SCREEN_WIDTH
     Gui.group.default.size[2] = 25
     Gui.group.default.spacing = 5
 end
@@ -24,7 +25,7 @@ end
 
 function st:draw()
 	love.graphics.draw(Image.logo, SCREEN_WIDTH/2, SCREEN_HEIGHT/4, 0, 2, 2, Image.logo:getWidth()/2, Image.logo:getHeight()/2)
-	love.graphics.setFont(Font[30])
+	love.graphics.setFont(Font.XPDR[16])
     Gui.core.draw()
 end
 
