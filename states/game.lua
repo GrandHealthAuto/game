@@ -12,16 +12,6 @@ function st:resetWorld()
 	print ("resetting world")
 end
 
-function st:addObstacle(pos, dimensions)
-	local obstacle = Entity.obstacle (pos, dimensions)
-	obstacle:registerPhysics (self.world, 0.)
-end
-
-function st:addPedestrian(pos, angle)
-	local pedestrian = Entity.pedestrian (pos, angle)
-	pedestrian:registerPhysics(self.world, 1.)
-end
-
 function st:beginContact (a, b, coll)
 	local entity_a = a:getUserData()
 	local entity_b = b:getUserData()
@@ -56,27 +46,22 @@ end
 function st:enter()
 	self:resetWorld()
 
-	self.player = Entity.player (vector(40, 100))
-	self.player:registerPhysics (self.world, 1.)
+	self.player = Entity.player(vector(40, 100))
 
-        self.cars = {}
-        for i = 1,30 do
-            local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
-            local car = Entity.car (pos, math.random(0,3.1415), "car" .. i)
-            car:registerPhysics (self.world, 1.)
-            table.insert(self.cars, car)
-        end
+	for i = 1,30 do
+		local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
+		Entity.car(pos, math.random(0,3.1415), "car" .. i)
+	end
 
 	cam = Camera()
     cam.scale = 2
 	for rect in pairs(geometry) do
-		self:addObstacle (vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
+		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
-
-	self:addPedestrian (vector(100, 100), 0 )
+	Entity.pedestrian(vector(100, 100), 0)
 
 	self.marker = Entity.questmarker(vector(-100,-100))
-	self.marker:registerPhysics(self.world, 0)
+	Entities.registerPhysics(self.world)
 
 	self.pickup_progress = 0
 	Signal.register('victim-picked-up', function() print("YAY!") self.pickup_progress = 0 end)

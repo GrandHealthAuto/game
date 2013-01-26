@@ -6,6 +6,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
                 self.angle = angle
                 self.state = 'drive'
                 self.lastStateUpdate = love.timer.getMicroTime()
+		self.mass = 1
 
                 self.angleRotateSide = 3.14159 / 2 -- 90°
                 self.rayCastLengthForward = 35

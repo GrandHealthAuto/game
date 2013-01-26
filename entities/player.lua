@@ -2,6 +2,7 @@ local player = class{name = "Player", inherits = Entity.BaseEntity,
 	function (self, pos)
 		Entity.BaseEntity.construct (self, pos, vector(32, 16))
 		self.visual = Image.ambulance
+		self.mass = 1
 	end
 }
 

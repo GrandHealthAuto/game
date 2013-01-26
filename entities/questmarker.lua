@@ -1,4 +1,4 @@
-local marker = class{inherits = Entity.BaseEntity,
+local marker = class{name = 'QuestMarker', inherits = Entity.BaseEntity,
 	function (self, pos, radius)
 		Entity.BaseEntity.construct(self, pos, vector(128,128))
 		--self.visual = Image.victim

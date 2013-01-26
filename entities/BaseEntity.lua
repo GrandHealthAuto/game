@@ -2,8 +2,9 @@ local base_entity = class{name = "BaseEntity", function (self, pos, dimensions)
 	self.pos = pos:clone()
 	self.dimensions = dimensions:clone()
 	self.velocity = vector(0,0)
-	self.angle = 0.
-	self.angle_velocity = 0.
+	self.angle = 0
+	self.angle_velocity = 0
+	self.mass = self.mass or 0
 	self.physics = {}
 
 	--print ("adding base_entity")
@@ -42,9 +43,9 @@ function base_entity:draw()
 
 end
 
-function base_entity:registerPhysics(world, mass)
+function base_entity:registerPhysics(world)
 	local physics_type = 'dynamic'
-	if mass == 0. then
+	if self.mass == 0 then
 		physics_type = 'static'
 	end
 
