@@ -123,6 +123,7 @@ function st:enter()
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
 		hs:add(-100)
+		Sound.static["shout"..math.random(2)]:play()
 		local v = Entity.victim(pedestrian.pos)
 		self.victims[v] = v
 		Entities.remove(pedestrian)
