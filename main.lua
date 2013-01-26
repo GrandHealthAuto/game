@@ -6,8 +6,6 @@ GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
 Entities   = require 'entities'
 BaseEntity = require 'entities.BaseEntity'
-Player  = require 'entities.player'
-Obstacle = require 'entities.obstacle'
 
 require 'slam'
 

@@ -8,7 +8,7 @@ function st:resetWorld()
 end
 
 function st:addObstacle(pos, dimensions)
-	local obstacle = 	Obstacle (pos, dimensions)
+	local obstacle = Entity.obstacle (pos, dimensions)
 	obstacle:registerPhysics (self.world, 0.)
 end
 
@@ -16,7 +16,7 @@ function st:init()
 	print ("State.game.init()")
 	self:resetWorld()
 
-	self.player = Player (vector(40, 100), vector(32, 32))
+	self.player = Entity.player (vector(40, 100), vector(32, 32))
 	self.player:registerPhysics (self.world, 1.)
 
 	map, geometry = (require 'level-loader')('map.png', {
