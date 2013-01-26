@@ -4,18 +4,12 @@ local pedestrian = class{name = "Pedestrian", inherits = Entity.BaseEntity,
 		self.visual = Image.pedestrian
 		self.angle = angle or 0
 		self.mass = 1
+		self.angle = angle
 	end
 }
 
 function pedestrian:update(dt)
 	self:updateFromPhysics()
-
-	local heading = vector (math.cos(self.angle), math.sin(self.angle))
-	self.velocity = vector (0, 0)
-
-	self.pos = self.pos + dt * self.velocity	
-	self.angle = self.angle + dt * self.angle_velocity
-
 	self:updateToPhysics()
 end
 

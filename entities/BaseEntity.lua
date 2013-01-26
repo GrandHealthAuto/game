@@ -50,11 +50,17 @@ function base_entity:registerPhysics(world)
 	end
 
 	self.physics.body  = self.physics.body or love.physics.newBody(world, self.pos.x, self.pos.y  - self.dimensions.y, physics_type)
+	self.physics.body:setLinearDamping (self.linear_damping or 10)
+	self.physics.body:setAngularDamping (self.linear_damping or 10)
+
 	self.physics.shape = self.physics.shape or love.physics.newRectangleShape(0, 0, self.dimensions.x, self.dimensions.y)
 
 	self.physics.fixture = self.physics.fixture or love.physics.newFixture(self.physics.body, self.physics.shape, 1)
 
 	self.physics.fixture:setUserData (self)
+
+	self.physics.body:setPosition (self.pos.x, self.pos.y)
+	self.physics.body:setAngle (self.angle)
 
 	self:updateToPhysics()
 end
@@ -71,10 +77,7 @@ end
 
 function base_entity:updateToPhysics()
 	if self.physics then
-		self.physics.body:setPosition (self.pos.x, self.pos.y)
-		self.physics.body:setAngle (self.angle)
 		self.physics.body:setAngularVelocity (self.angle_velocity)
-
 		self.physics.body:setLinearVelocity (self.velocity.x, self.velocity.y)
 	end
 end
