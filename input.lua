@@ -48,10 +48,10 @@ function _M.update()
 
 		-- FIXME: more than one joystick?
 		for _, axis in ipairs(info.axis) do
-			-- mag = mag or love.joystick.getAxis(1, math.abs(axis)) * axis
-			if mag == 0 then
-				mag = love.joystick.getAxis(1, math.abs(axis)) * axis
-			end
+			mag = mag + love.joystick.getAxis(1, math.abs(axis)) * axis
+			-- if mag == 0 then
+			-- 	mag = love.joystick.getAxis(1, math.abs(axis)) * axis
+			--end
 		end
 
 		local down = mag > .5

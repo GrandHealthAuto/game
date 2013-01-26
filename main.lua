@@ -146,8 +146,10 @@ function love.load()
 
 	Input.bind{name = 'left',   key = {'left',  'a'}, axis = -1}
 	Input.bind{name = 'right',  key = {'right', 'd'}, axis = 1}
-	Input.bind{name = 'up',     key = {'up',    'w'}, axis = -3}
-	Input.bind{name = 'down',   key = {'down',  's'}, axis = 3} 
+	Input.bind{name = 'up',     key = {'up',    'w'}, axis = {-2}}
+	Input.bind{name = 'down',   key = {'down',  's'}, axis = {2}} 
+	Input.bind{name = 'accelerate', key = {'up', 'w'}, axis = {-3}}
+	Input.bind{name = 'decelerate', key = {'down','s'}, axis = {3}}
 	Input.bind{name = 'action', key = {' ', 'enter', 'return'}, button = 1}
 end
 

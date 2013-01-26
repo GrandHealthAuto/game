@@ -35,7 +35,7 @@ function player:update(dt)
 		self.angle_velocity = - GVAR["player_rotation_speed"] * speed / GVAR["player_accel_max_speed"]
 	end
 
-	if Input.isDown('up') then
+	if Input.isDown('accelerate') then
 		if speed < GVAR["player_accel_max_speed"] then
 			local drag_penalty = 1.
 
@@ -47,7 +47,7 @@ function player:update(dt)
 		end
 	end
 
-	if Input.isDown('down') then
+	if Input.isDown('decelerate') then
 		if speed < GVAR["player_reverse_max_speed"] then
 			local drag_penalty = 1.
 

@@ -36,9 +36,6 @@ function st:update(dt)
 		GS.switch(State.firstrun)
 	end
 	
-	if love.joystick.getName(1) == "Controller (XBOX 360 For Windows)" then
-		Gui.Label{text = "Gamepad: Press LT for Down, and RT for up, A for Enter", pos={120,100}}
-	end
 	-- on mouse move -> set widget focus to mouse
 	if mouse_hot ~= Gui.mouse.getHot() then
 		Gui.keyboard.setFocus(Gui.mouse.getHot() or Gui.keyboard.getFocus())
