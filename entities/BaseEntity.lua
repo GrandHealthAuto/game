@@ -15,7 +15,13 @@ end
 }
 
 function base_entity:draw()
+	old_color = {love.graphics.getColor() }
+
 	if self.visual then
+		if self.color then
+			love.graphics.setColor (self.color)
+		end
+
 		love.graphics.draw(self.visual,
 			self.pos.x, self.pos.y, self.angle,
 			1, 1,
@@ -24,17 +30,14 @@ function base_entity:draw()
 	end
 
 	if GVAR.draw_collision_boxes then
-		old_color = {love.graphics.getColor() }
-
 		love.graphics.setColor(255, 0., 0., 255)
 
 		if self.physics.shape:getType() == 'polygon' then
 			love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
 		end
-
-		love.graphics.setColor(old_color)
 	end
 
+	love.graphics.setColor(old_color)
 end
 
 function base_entity:registerPhysics(world)
