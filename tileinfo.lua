@@ -29,6 +29,10 @@ return {
     },
     {
         name = "rightstreet"
-    }
+    },
+    {
+        name = "sidewalk",
+		is_rescue_zone = true,
+    },
     
 }

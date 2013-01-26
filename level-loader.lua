@@ -76,9 +76,9 @@ return function(map_path, tile_info, tile_data)
 			if tile.name then
 				row[x+1] = quads[tile.name]
 			end
-			if tile.name == 'rescue_zone' then
-				map.rescue_zone.x = (x+.5) * TW
-				map.rescue_zone.y = (y-.5) * TH
+			if tile.is_rescue_zone then
+				map.rescue_zone.x = (x+1) * TW
+				map.rescue_zone.y = (y+.5) * TH
 			end
 
 			if tile.is_collision_tile then

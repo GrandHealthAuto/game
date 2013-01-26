@@ -22,7 +22,6 @@ function marker:beginContact(other)
 	end, function()
 		if self.playerInRange then
 			Signal.emit('victim-picked-up')
-			Entities.remove(self)
 		end
 	end)
 end
