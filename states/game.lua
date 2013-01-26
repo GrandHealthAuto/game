@@ -73,7 +73,7 @@ function st:enter()
 	end
 
 	cam = Camera()
-	cam.scale = 1
+	cam.scale = 2
 	cam.pos = vector(cam.x, cam.y)
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
@@ -149,6 +149,7 @@ function st:leave()
 end
 
 function st:draw()
+	love.graphics.setColor(255,255,255)
 	cam:attach()
 	map:draw(cam)
 	Entities.draw()
@@ -158,24 +159,9 @@ function st:draw()
 	end
 
 	self.heart_monitor:drawMarker()
-
-	local red = {142,0,31, 100}
-	local center = vector(self.marker.physics.body:getPosition())
-	love.graphics.setColor(red); red[4] = 150
-	love.graphics.setLine(4, 'smooth')
-	love.graphics.circle('line', center.x, center.y, 64)
-	love.graphics.setColor(red); red[4] = 200
-	love.graphics.setLine(2, 'smooth')
-	love.graphics.circle('line', center.x, center.y, 64)
-	love.graphics.setColor(red);
-	love.graphics.setLine(2, 'smooth')
-	love.graphics.circle('line', center.x, center.y, 64)
-	love.graphics.setLine(1, 'rough')
-	love.graphics.setColor(255,255,255)
-
 	cam:detach()
 
-	love.graphics.print(hs.value, SCREEN_WIDTH-20, 0)
+	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
 	self.heart_monitor:draw()
 end
 
