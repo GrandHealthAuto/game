@@ -36,8 +36,6 @@ end
 function player:update(dt)
 	self:updateFromPhysics()
 
-	local heading = vector (math.cos(self.angle), math.sin(self.angle))
-
 	local acceleration = vector(0,0)
 
 	local speed = math.sqrt(self.velocity.x * self.velocity.x + self.velocity.y * self.velocity.y)
@@ -48,11 +46,7 @@ function player:update(dt)
 		self.velocity.y = 0.
 	end
 
-	local heading = vector(math.cos (self.angle), math.sin (self.angle))
-	local heading_dot_velocity = heading.x * self.velocity.x + heading.y * self.velocity.y
-
--- self.angle_velocity = 0.
-
+	self.heading = vector(math.cos (self.angle), math.sin (self.angle))
 	local rotation_speed_factor = math.min (speed, 320) / 320
 
 	-- 
@@ -70,10 +64,10 @@ function player:update(dt)
 		self.angle_velocity = 0.
 
 		if speed < GVAR["player_accel_max_speed"] then
-			acceleration = heading * GVAR["player_accel"] * 1. 
+			acceleration = self.heading * GVAR["player_accel"] * 1. 
 		else
 			print ("superspeed")
-			acceleration = heading * GVAR["player_accel"] * 1.
+			acceleration = self.heading * GVAR["player_accel"] * 1.
 		end
 	end
 
@@ -87,7 +81,7 @@ function player:update(dt)
 				drag_penalty = (GVAR["player_reverse_max_speed"] - speed) / (dt * math.abs(GVAR["player_reverse"]))
 			end
 
-			acceleration = heading * GVAR["player_reverse"] * drag_penalty 
+			acceleration = self.heading * GVAR["player_reverse"] * drag_penalty 
 		end
 
 		self.angle_velocity = - self.angle_velocity
