@@ -1,4 +1,5 @@
-highscore = require "highscore"
+local highscore = require "highscore"
+local hs = highscore(GVAR['player_name'])
 
 local st = GS.new()
 
@@ -103,9 +104,11 @@ function st:enter()
 
 	-- pedestrians
 	Signal.register('pedestrian-injured', function (pedestrian)
+		hs:add(-100)
 		print ("Pedestrian at " .. tostring (pedestrian.pos) .. " was injured.")
 	end)
 	Signal.register('pedestrian-killed', function (pedestrian)
+		hs:add(-500)
 		print ("Pedestrian at " .. tostring (pedestrian.pos) .. " was killed.")
 	end)
 
@@ -113,6 +116,7 @@ function st:enter()
 end
 
 function st:leave()
+	hs:save()
 	Signal.clear('victim-picked-up', 'victim-pickup-timer', 'victim-pickup-abort')
 	Entities.clear()
 	self.player = nil
