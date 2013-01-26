@@ -13,7 +13,7 @@ require 'slam'
 
 -- evil global variables
 GVAR = {
-	draw_collision_boxes = true,
+	draw_collision_boxes = false,
 
 	player_linear_damping = 0.15 * 32,
 	player_angular_damping = 0.1,

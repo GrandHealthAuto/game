@@ -15,28 +15,24 @@ end
 }
 
 function base_entity:draw()
-	if GVAR.draw_collision_boxes or self.visual == nil then
-		old_color = {love.graphics.getColor() }
-
-		love.graphics.setColor(255, 0., 0., 255)
-
-		love.graphics.push()
-		love.graphics.translate (self.pos.x, self.pos.y)
-		love.graphics.rotate (self.angle)
-		love.graphics.rectangle('line',
-			-self.dimensions.x * 0.5 + self.shape_offset.x, -self.dimensions.y * 0.5 + self.shape_offset.y,
-			self.dimensions.x, self.dimensions.y)
-		love.graphics.pop()
-
-		love.graphics.setColor(old_color)
-	end
-
 	if self.visual then
 		love.graphics.draw(self.visual,
 			self.pos.x, self.pos.y, self.angle,
 			1, 1,
 			self.visual:getWidth() * 0.5 - self.shape_offset.x,
 			self.visual:getHeight() * 0.5 - self.shape_offset.y)
+	end
+
+	if GVAR.draw_collision_boxes then
+		old_color = {love.graphics.getColor() }
+
+		love.graphics.setColor(255, 0., 0., 255)
+
+		if self.physics.shape:getType() == 'polygon' then
+			love.graphics.polygon("line", self.physics.body:getWorldPoints(self.physics.shape:getPoints()))
+		end
+
+		love.graphics.setColor(old_color)
 	end
 
 end
