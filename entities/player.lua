@@ -1,4 +1,4 @@
-local player = class{inherits = Entity.BaseEntity,
+local player = class{name = "Player", inherits = Entity.BaseEntity,
 	function (self, pos)
 		Entity.BaseEntity.construct (self, pos, vector(32, 16))
 		self.visual = Image.ambulance
@@ -29,8 +29,11 @@ function player:update(dt)
 	self:updateToPhysics()
 end
 
-function player:collide (other, coll)
-	print ("player is colliding")
+function player:beginContact (other, coll)
 end
+
+function player:endContact (other, coll)
+end
+
 
 return player

@@ -26,18 +26,26 @@ function st:beginContact (a, b, coll)
 	local entity_a = a:getUserData()
 	local entity_b = b:getUserData()
 
---	print ("entity_a = " .. tostring (entity_a))
-
-	if a.collide ~= nil then
-		a:collide (entity_b, coll)
+	if entity_a.beginContact ~= nil then
+		entity_a:beginContact (entity_b, coll)
 	end
 
-	if b.collide ~= nil then
-		b:collide (entity_a, coll)
+	if entity_b.beginContact ~= nil then
+		entity_b:beginContact (entity_a, coll)
 	end
 end
 
 function st:endContact (a, b, coll)
+	local entity_a = a:getUserData()
+	local entity_b = b:getUserData()
+
+	if entity_a.endContact ~= nil then
+		entity_a:endContact (entity_b, coll)
+	end
+
+	if entity_b.endContact ~= nil then
+		entity_b:endContact (entity_a, coll)
+	end
 end
 
 function st:init()
