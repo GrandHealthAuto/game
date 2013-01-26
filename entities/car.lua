@@ -13,7 +13,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 
 		self.direction = 'east'
 		self.hitList = {}
-		self.debug = true
+		self.debug = false
 	end
 }
 
