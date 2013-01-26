@@ -127,6 +127,7 @@ function st:enter()
 		hs:add(-100)
 		Sound.static["shout"..math.random(2)]:play()
 		local v = Entity.victim(pedestrian.pos)
+		v.color = pedestrian.color
 		self.victims[v] = v
 		Entities.remove(pedestrian)
 	end)
