@@ -34,5 +34,9 @@ return {
         name = "sidewalk",
 		is_rescue_zone = true,
     },
+	{
+		name = "hochhaus",
+		is_collision_tile = true
+	}
     
 }
