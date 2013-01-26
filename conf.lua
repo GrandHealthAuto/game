@@ -5,8 +5,8 @@ function love.conf(t)
 	t.identity          = "grand_health_auto"
 	--t.release           = true
 
-	t.screen.width      = 800
-	t.screen.height     = 600
+	t.screen.width      = 1024
+	t.screen.height     = 720
 	t.screen.fullscreen = false
 	t.screen.fsaa       = 0
 	t.screen.vsync      = true

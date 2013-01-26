@@ -43,6 +43,8 @@ function monitor:drawMarker()
 	love.graphics.setColor(255,255,255,p*255)
 	love.graphics.draw(self.heart[1], self.mpos.x, self.mpos.y, 0, hs,hs, hox,hoy)
 	love.graphics.draw(self.arrow[1], apos.x, apos.y, phi, as,as, aox,aoy)
+
+	love.graphics.setColor(255,255,255)
 end
 
 function monitor:update(dt)

@@ -155,6 +155,11 @@ return function(map_path, tile_info, tile_data)
 		return (x - 1) * TW, y * TH, x * TW, (y + 1) * TH
 	end
 
+	function map:mapCoordsCenter(x, y)
+		local x1, y1, x2, y2 = self:mapCoords(x, y)
+		return vector((x2 + x1) / 2, (y2 + y1) / 2)
+	end
+
 	function map:cell(i,k)
 		return (self[k] or {})[i] or {}
 	end

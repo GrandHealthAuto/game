@@ -4,8 +4,21 @@ local marker = class{name = 'QuestMarker', inherits = Entity.BaseEntity,
 		--self.visual = Image.victim
 
 		self.physics.shape = love.physics.newCircleShape(radius or 64)
+		self.t = 0
 	end
 }
+
+function marker:update(dt)
+	self.t = (self.t + dt) % (2 * math.pi)
+end
+
+function marker:draw()
+	local pos = vector(self.physics.body:getPosition())
+	love.graphics.draw(Image.pick_me_up, pos.x,
+		pos.y, 0,1.5,1.5,
+		Image.pick_me_up:getWidth()/2,
+		Image.pick_me_up:getHeight() + (.5 + .5*math.sin(self.t)) * 10)
+end
 
 function marker:registerPhysics(...)
 	Entity.BaseEntity.registerPhysics(self, ...)
