@@ -14,7 +14,7 @@ end
 local function remove(entity, ...)
 	assert(entity, "No entity to remove")
 	entities[entity] = nil
-	(entity.onDelete or _NOP_)(entity, ...)
+	(entity.finalize or _NOP_)(entity, ...)
 end
 
 local function clear(...)
