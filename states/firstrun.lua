@@ -1,7 +1,7 @@
 local Gui = require "Quickie"
 local st = GS.new()
 local mouse_hot, mouse_x, mouse_y
-local inputInfo={text=""}
+local inputInfo={text=GVAR["player_name"]}
 function st:enter()
 	Gui.core.style = require 'gui.style'
 	Gui.group.default.size[1] = SCREEN_WIDTH
@@ -18,8 +18,11 @@ end
 
 function st:update(dt)
 	Gui.group.push{grow = "down", pos={SCREEN_WIDTH/2-Gui.group.default.size[1]/2,SCREEN_HEIGHT/2}}
-	Gui.Input{info = inputInfo, size={100}}
-	
+		Gui.Label{text="Please enter your name and press >>Start<<"}
+		Gui.Input{info = inputInfo}
+		if Gui.Button{text="Start"} then
+			GS.switch(State.menu)
+		end
 	Gui.group.pop{}
 	-- on mouse move -> set widget focus to mouse
 	if mouse_hot ~= Gui.mouse.getHot() then
@@ -35,17 +38,6 @@ function st:draw()
 end
 
 function st:mappingDown(mapping)
-	local cycle
-	if mapping == 'up' then
-		Gui.keyboard.pressed('select-prev')
-	elseif mapping == 'down' then
-		Gui.keyboard.pressed('select-next')
-	elseif mapping == 'action' then
-		Gui.keyboard.pressed('return')
-	else
-		return
-	end
-
 	-- sync keyboard and mouse highlight
 	Gui.mouse.setHot(Gui.keyboard.getFocus())
 	mouse_hot = Gui.mouse.getHot()
@@ -53,7 +45,9 @@ function st:mappingDown(mapping)
 end
 
 function st:keypressed(key,code)
-	Gui.keyboard.pressed(key, code)
+	if (code >= 65 and code <= 90) or (code >=97 and code <=122) or code == 8 or code == 9  or code == 32 then
+		Gui.keyboard.pressed(key, code)
+	end
 end
 
 return st
