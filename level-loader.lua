@@ -59,7 +59,7 @@ return function(map_path, tile_info, tile_data)
 	local color_to_tile = {}
 	for x = 0,image_data:getWidth()-1 do
 		local hex = ("%02x%02x%02x%02x"):format(image_data:getPixel(x,0))
-		if color_to_tile[hex] then break end
+		--if color_to_tile[hex] then break end
 		color_to_tile[hex] = x+1
 	end
 
@@ -119,7 +119,7 @@ return function(map_path, tile_info, tile_data)
 
 	-- map drawing
 	function map:draw(cam, overdraw)
-		overdraw = overdraw or 5
+		overdraw = overdraw or 7
 		-- rotated bounding box
 		local xul,yul = cam:worldCoords(0,0)
 		local xll,yll = cam:worldCoords(0, SCREEN_HEIGHT)
