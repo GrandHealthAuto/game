@@ -135,7 +135,6 @@ function st:draw()
 	end
 end
 
-local timeslice = 0
 function st:update(dt)
 	cam.target    = self.player.pos
 	cam.direction = cam.target - cam.pos
@@ -149,13 +148,7 @@ function st:update(dt)
 	cam.pos = cam.pos + delta
 	cam:lookAt(math.floor(cam.pos.x+.5), math.floor(cam.pos.y+.5))
 
-	if self.world then
-		timeslice = timeslice + dt
-		while timeslice > 1/60 do
-			self.world:update(1/60)
-			timeslice = timeslice - 1/60
-		end
-	end
+	self.world:update(dt)
 
 	Entities.update(dt)
 end
