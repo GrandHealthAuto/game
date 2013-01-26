@@ -5,7 +5,23 @@ Camera     = require 'hump.camera'
 GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
 Entities   = require 'entities'
+BaseEntity = require 'entities.BaseEntity'
+Player  = require 'entities.player'
+Obstacle = require 'entities.obstacle'
+
 require 'slam'
+
+function serialize(t, indent)
+	indent = "  " or indent
+	for k,v in pairs(t) do
+		if type(v) == "table" then
+			print (indent .. " " .. k .. " = table (" .. tostring(v) .. "):")
+			serialize (v, indent .. "  ")
+		else
+			print (indent .. " " .. k .. " = " .. tostring(v))
+		end
+	end
+end
 
 function GS.transition(to, length, ...)
 	length = length or 1
@@ -110,6 +126,8 @@ function love.load()
 	GS.registerEvents()
 	--GS.switch(State.splash)
 	GS.switch(State.menu)
+
+	love.physics.setMeter (32)
 end
 
 function love.update(dt)
@@ -117,7 +135,9 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-	if key == 'escape' then
+	if key == 'return' then
+		GS.switch (State.game)
+	elseif key == 'escape' then
 		local continue
 		continue = Interrupt{
 			draw = function(draw)

@@ -1,5 +1,5 @@
 local cls = Class{name = "Template", function(self)
-	Entities.register(self)
+	Entities.add(self)
 	-- more init stuff
 end}
 

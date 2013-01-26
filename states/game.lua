@@ -2,7 +2,7 @@ local st = GS.new()
 
 st.world = {}
 
-function st:resetworld()
+function st:resetWorld()
 	st.world = love.physics.newWorld()
 	print ("resetting world")
 end
@@ -12,8 +12,13 @@ end
 
 function st:init()
 	print ("State.game.init()")
-	self:resetworld()
+	self:resetWorld()
+
 	self.player = Player (vector(40, 100), vector(32, 32))
+
+	Obstacle (vector(192, 496), vector (64, 256))
+	Obstacle (vector(512, 386), vector (64, 256))
+	Obstacle (vector(386, 256), vector (64, 256))
 end
 
 function st:leave()
@@ -28,6 +33,8 @@ function st:draw()
 end
 
 function st:update(dt)
+--	self.world.update(dt)
+
 	Entities.update(dt)
 end
 

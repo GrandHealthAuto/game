@@ -42,6 +42,4 @@ function player:turn_right(state)
 	self.controls.right = state
 end
 
-
-
 return player

@@ -26,7 +26,7 @@ return setmetatable({
 }, {__index = function(_, func)
 	return function(...)
 		for e in pairs(entities) do
-			(e[func] or _NOP_)(...)
+			(e[func] or _NOP_)(e,...)
 		end
 	end
 end})
