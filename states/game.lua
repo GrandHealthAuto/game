@@ -162,6 +162,20 @@ function st:draw()
 		love.graphics.setLine(1, 'rough')
 	end
 
+	local red = {142,0,31, 100}
+	local center = vector(self.marker.physics.body:getPosition())
+	love.graphics.setColor(red); red[4] = 150
+	love.graphics.setLine(4, 'smooth')
+	love.graphics.circle('line', center.x, center.y, 64)
+	love.graphics.setColor(red); red[4] = 200
+	love.graphics.setLine(2, 'smooth')
+	love.graphics.circle('line', center.x, center.y, 64)
+	love.graphics.setColor(red);
+	love.graphics.setLine(2, 'smooth')
+	love.graphics.circle('line', center.x, center.y, 64)
+	love.graphics.setLine(1, 'rough')
+	love.graphics.setColor(255,255,255)
+
 	cam:detach()
 
 	if self.pickup_progress > 0 then
@@ -178,10 +192,14 @@ function st:draw()
 end
 
 function st:update(dt)
-	cam.target    = self.player.pos + self.player.velocity * dt * 40
+	--FIXME
+	local lookahead = self.player.velocity * 40 * dt
+	lookahead.x = math.max(math.min(lookahead.x, 200), -200)
+	lookahead.y = math.max(math.min(lookahead.y, 200), -200)
+	cam.target = self.player.pos + lookahead
 
 	-- awesome camera zooming
-	-- cam:zoomTo(2. -  self.player.velocity:len() * 0.001)
+	--cam:zoomTo(2. -  self.player.velocity:len() * 0.001)
 
 	cam.direction = cam.target - cam.pos
 	local delta = cam.direction * dt * 4

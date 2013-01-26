@@ -79,7 +79,7 @@ end
 local up = GS.update
 GS.update = function(dt)
 	--if love.keyboard.isDown('1') then dt = dt / 10 end -- slow mo
-	return up(math.min(dt, 1/30))
+	return up(math.min(dt, 1/60))
 end
 
 
