@@ -5,7 +5,7 @@ local base_entity = class{name = "BaseEntity", function (self, pos, dimensions)
 	self.angle = 0.
 	self.angle_velocity = 0.
 
-	print ("adding base_entity")
+	--print ("adding base_entity")
 	Entities.add(self)
 end
 }
