@@ -19,6 +19,13 @@ function st:init()
 	Obstacle (vector(192, 496), vector (64, 256))
 	Obstacle (vector(512, 386), vector (64, 256))
 	Obstacle (vector(386, 256), vector (64, 256))
+
+	map, geometry = (require 'level-loader')('map.png', {
+		width = 32, height = 32, {name = 'foo'}, {name = 'foo', is_collision_tile = true}
+	}, {texture = 'tiles.png', frames = {
+		{name = 'foo', uvRect = {u0 = 0, v0 = 0, u1 = 1, v1 = 1}}
+	}})
+	cam = Camera()
 end
 
 function st:leave()
@@ -26,14 +33,24 @@ function st:leave()
 end
 
 function st:draw()
+	cam:attach()
+
 	love.graphics.setFont(Font[30])
 	love.graphics.printf("GAME", 0,SCREEN_HEIGHT/4-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
 
+	map:draw(cam)
+	for rect in pairs(geometry) do
+		love.graphics.rectangle('line', rect.x-3, rect.y-3, rect.w-6, rect.h-6)
+	end
+
 	Entities.draw()
+
+	cam:detach()
 end
 
 function st:update(dt)
 --	self.world.update(dt)
+	cam:lookAt(self.player.pos:unpack())
 
 	Entities.update(dt)
 end
