@@ -1,7 +1,7 @@
 local player = class{name = "Player", inherits = Entity.BaseEntity,
 	function (self, pos)
 		Entity.BaseEntity.construct (self, pos, vector(32, 16))
-		self.visual = Image.ambulance
+		self.visual = Image.ambulancebig
 		self.mass = 1
 		self.linear_damping = GVAR.player_linear_damping
 	end
