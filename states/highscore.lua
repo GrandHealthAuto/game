@@ -18,7 +18,6 @@ function st:update(dt)
 		grow = "down", 
 		pos={
 			SCREEN_WIDTH/2-Gui.group.default.size[1]/2,
-			--SCREEN_HEIGHT
 			0
 		},
 	}
@@ -42,13 +41,15 @@ function st:update(dt)
 		Gui.group.push{ grow="right", size={ 300, 30}, pos={10,10} }
 			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
 		Gui.group.pop{}
-		
+				
 		if hsData then
 			for i, player in pairs(hsData) do
 				Gui.group.push{ grow="right", size={ 300, 30}, pos={10,0} }
 					Gui.Label{text=player["rank"], size={100, 30}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
 				Gui.group.pop{}
 			end
+		else
+			Gui.Label{text="The highscore server is currently not reachable"}
 		end
 		
 		if Gui.Button{text="Back"} then
