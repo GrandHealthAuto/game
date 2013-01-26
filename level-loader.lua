@@ -84,6 +84,7 @@ return function(map_path, tile_info, tile_data)
 				else
 					-- merge adjacent boxes
 					box.w = box.w + TW
+					collision_boxes[y][x-1] = nil
 				end
 				collision_boxes[y][x] = box
 			end
@@ -94,16 +95,15 @@ return function(map_path, tile_info, tile_data)
 	-- merge adjacent collison boxes of same size (rows)
 	local row_last, geometry = {}, {}
 	for y,row in ipairs(collision_boxes) do
-		local box_last
 		for x,box in pairs(row) do
-			-- merge two boxes if they have the same width
 			local adjacent = row_last[x]
-			if adjacent and box ~= box_last and adjacent.w == box.w then
+			if adjacent and adjacent.w == box.w then
+				-- merge boxes
 				adjacent.h = adjacent.h + TH
-				row[x] = adjacent -- so this can accessed in the next row
+				row[x] = adjacent
+			else
+				geometry[row[x]] = row[x] -- record geometry
 			end
-			geometry[row[x]] = row[x] -- record geometry
-			box_last = box
 		end
 		row_last = row
 	end
