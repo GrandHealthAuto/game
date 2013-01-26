@@ -40,6 +40,10 @@ return {
     },
 	{
 		name = "grass"
+	},
+	{
+		name = "hochhausstufe",
+		is_collision_tile = true
 	}
     
 }
