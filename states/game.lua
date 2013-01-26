@@ -157,34 +157,7 @@ function st:draw()
 		self.player:draw()
 	end
 
-	if self.marker then
-		local ppos = vector(self.player.physics.body:getPosition())
-		local qpos = vector(self.marker.physics.body:getPosition())
-		local dir  = qpos - ppos
-		local dist = dir:len()
-		dir:normalize_inplace()
-		local phi = math.atan2(dir.y, dir.x)
-
-		local arrow = {Image.questmarker_arrow_full, Image.questmarker_arrow_empty}
-		local heart = {Image.questmarker_heart_full, Image.questmarker_heart_empty}
-
-		local p = self.pickup_progress or 0
-		if self.current_passanger then p = 1 end
-
-		local offset = math.max(20, math.min(100, dist))
-		local hpos = ppos + dir * offset
-		local hs, hox, hoy = self.heart_monitor.scale/2, heart[1]:getWidth()/2, heart[1]:getHeight()/2
-		local apos = ppos + dir * (offset + arrow[1]:getWidth() * 1.1)
-		local as, aox, aoy = 1, arrow[1]:getWidth()/2, arrow[1]:getHeight()/2
-
-		love.graphics.setColor(255,255,255,(1-p)*255)
-		love.graphics.draw(heart[2], hpos.x, hpos.y, 0, hs,hs, hox,hoy)
-		love.graphics.draw(arrow[2], apos.x, apos.y, phi, as,as, aox,aoy)
-
-		love.graphics.setColor(255,255,255,p*255)
-		love.graphics.draw(heart[1], hpos.x, hpos.y, 0, hs,hs, hox,hoy)
-		love.graphics.draw(arrow[1], apos.x, apos.y, phi, as,as, aox,aoy)
-	end
+	self.heart_monitor:drawMarker()
 
 	local red = {142,0,31, 100}
 	local center = vector(self.marker.physics.body:getPosition())
