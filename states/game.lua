@@ -137,6 +137,8 @@ function st:enter()
 	local v = Entity.victim(map.rescue_zone + vector(500,0))
 	self.victims[v] = v
 	Signal.emit('get-next-victim')
+
+	self.heart_monitor = Entity.heartmonitor()
 end
 
 function st:leave()
@@ -150,6 +152,10 @@ function st:draw()
 	cam:attach()
 	map:draw(cam)
 	Entities.draw()
+
+	if self.player then
+		self.player:draw()
+	end
 
 	if self.marker then
 		local ppos = vector(self.player.physics.body:getPosition())
@@ -189,8 +195,9 @@ function st:draw()
 		love.graphics.setLine(1, 'rough')
 		love.graphics.setColor(255,255,255)
 	end
-	love.graphics.draw(Image.heart, SCREEN_WIDTH/2-Image.heart:getHeight(), 0, 0, 2, 2)
+
 	love.graphics.print(hs.value, SCREEN_WIDTH-20, 0)
+	self.heart_monitor:draw()
 end
 
 function st:update(dt)
@@ -216,6 +223,7 @@ function st:update(dt)
 
 	self.world:update(dt)
 
+	self.heart_monitor:update(dt)
 	Entities.update(dt)
 end
 
