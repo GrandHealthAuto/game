@@ -15,8 +15,11 @@ victim-pickup-abort
 victim-picked-up
     - victim picked up/delivered (player stayed in zone)
 
-pedestrian-injured (pedestrian)
-    - pedestrian was injured by the ambulance
+get-next-victim
+    - request new victim to pick up. may emit game-over
 
 pedestrian-killed (pedestrian)
     - pedestrian was injured by the ambulance
+
+game-over (string reason: one of "no more victims", "victim died in car")
+    - game over because of reason

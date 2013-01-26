@@ -9,5 +9,5 @@ function love.conf(t)
 	t.screen.height     = 600
 	t.screen.fullscreen = false
 	t.screen.fsaa       = 0
-	t.screen.vsync      = false
+	t.screen.vsync      = true
 end

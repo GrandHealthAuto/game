@@ -78,47 +78,65 @@ function st:enter()
 	Entity.pedestrian(vector(100, 100), 0)
 
 	self.marker = Entity.questmarker(map.rescue_zone)
-	Entities.registerPhysics(self.world)
 
-	self.pickup_progress = 0
-	self.victim_on_board = false
-	Signal.register('victim-picked-up', function()
-		self.pickup_progress = 0
-		if self.victim_on_board then
-			-- delivered at hospital
-			self.marker.physics.body:setPosition(map.rescue_zone:unpack())
-			self.victim_on_board = false
-		else
-			-- victim picked up
-			self.victim_on_board = true
-			-- TODO: next victim
-			self.marker.physics.body:setPosition(math.random(0, #map[1]*32), math.random(#map*32))
-		end
-		self.marker:updateFromPhysics()
+	self.victims = {}
+	self.current_target    = false
+	self.current_passanger = false
+	self.pickup_progress   = 0
+
+	Signal.register('victim-pickup-timer', function(p)
+		self.pickup_progress = p
 	end)
-	Signal.register('victim-pickup-timer', function(progress)
-		self.pickup_progress = progress
-	end)
+
 	Signal.register('victim-pickup-abort', function()
 		self.pickup_progress = 0
 	end)
 
-	-- pedestrians
-	Signal.register('pedestrian-injured', function (pedestrian)
-		hs:add(-100)
-		print ("Pedestrian at " .. tostring (pedestrian.pos) .. " was injured.")
-	end)
-	Signal.register('pedestrian-killed', function (pedestrian)
-		hs:add(-500)
-		print ("Pedestrian at " .. tostring (pedestrian.pos) .. " was killed.")
+	Signal.register('victim-picked-up', function()
+		if self.current_passanger then -- deliver at hospital
+			self.current_passanger = false
+			Signal.emit('get-next-victim')
+		else -- pick up victim
+			self.victims[self.current_target] = nil
+			self.current_passanger = self.current_target
+			self.current_passanger:stabilize()
+			self.current_target = false
+			self.marker.physics.body:setPosition(map.rescue_zone:unpack())
+			self.marker:updateFromPhysics()
+		end
 	end)
 
-	Signal.emit('victim-picked-up')
+	Signal.register('get-next-victim', function()
+		local target = next(self.victims)
+		if not target then
+			Signal.emit('game-over', 'no more victims')
+			return
+		end
+		self.current_target = target
+		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
+		self.marker:updateFromPhysics()
+		self.pickup_progress = 0
+	end)
+
+	-- pedestrians
+	Signal.register('pedestrian-killed', function (pedestrian)
+		hs:add(-100)
+		local v = Entity.victim(pedestrian.pos)
+		self.victims[v] = v
+		Entities.remove(pedestrian)
+	end)
+
+	Entities.registerPhysics(self.world)
+
+	-- XXX: properly initialize this
+	local v = Entity.victim(map.rescue_zone + vector(500,0))
+	self.victims[v] = v
+	Signal.emit('get-next-victim')
 end
 
 function st:leave()
 	hs:save()
-	Signal.clear('victim-picked-up', 'victim-pickup-timer', 'victim-pickup-abort')
+	Signal.clear()
 	Entities.clear()
 	self.player = nil
 end
@@ -155,13 +173,13 @@ function st:draw()
 end
 
 function st:update(dt)
-	cam.target    = self.player.pos + self.player.velocity * dt * 40 
+	cam.target    = self.player.pos + self.player.velocity * dt * 40
 
 	-- awesome camera zooming
-	-- cam:zoomTo(2. -  self.player.velocity:len() * 0.001) 
+	-- cam:zoomTo(2. -  self.player.velocity:len() * 0.001)
 
 	cam.direction = cam.target - cam.pos
-	local delta = cam.direction * dt * 4 
+	local delta = cam.direction * dt * 4
 	if math.abs(cam.direction.x) > SCREEN_WIDTH/3 then
 		delta.x = cam.direction.x
 	end
