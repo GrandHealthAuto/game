@@ -44,6 +44,9 @@ return {
 	{
 		name = "hochhausstufe",
 		is_collision_tile = truer
+	},
+	{
+	    name = "treewgrass"
 	}
     
 }
