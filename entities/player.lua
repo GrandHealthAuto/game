@@ -1,6 +1,6 @@
-local player = class{inherits = BaseEntity, 
+local player = class{inherits = Entity.BaseEntity,
 	function (self, pos, dimensions)
-		BaseEntity.construct (self, pos, dimensions)
+		Entity.BaseEntity.construct (self, pos, dimensions)
 		self.visual = Image.ambulance
 	end
 }

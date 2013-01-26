@@ -5,7 +5,6 @@ Camera     = require 'hump.camera'
 GS         = require 'hump.gamestate'
 Interrupt  = require 'interrupt'
 Entities   = require 'entities'
-BaseEntity = require 'entities.BaseEntity'
 Input      = require 'input'
 
 require 'slam'

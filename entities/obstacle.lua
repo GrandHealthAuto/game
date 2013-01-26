@@ -1,6 +1,6 @@
-local obstacle = class{inherits = BaseEntity, 
+local obstacle = class{inherits = Entity.BaseEntity,
 	function (self, pos, dimensions)
-		BaseEntity.construct (self, pos, dimensions)
+		Entity.BaseEntity.construct (self, pos, dimensions)
 	end
 }
 
