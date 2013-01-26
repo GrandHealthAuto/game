@@ -172,8 +172,8 @@ function st:update(dt)
 	lookahead.y = math.max(math.min(lookahead.y, 200), -200)
 	cam.target = self.player.pos + lookahead
 	if self.player.heading then
-		cam.rot_target = self.player.heading:cross(self.player.velocity:normalized()) * .05
-		cam.rot_target = math.min(math.max(cam.rot_target, -math.pi/16), math.pi/16)
+		cam.rot_target = self.player.heading:cross(self.player.velocity:normalized()) * .03
+		cam.rot_target = math.min(math.max(cam.rot_target, -math.pi/20), math.pi/20)
 		cam.rot = cam.rot + (cam.rot_target - cam.rot) * 5 * dt
 	end
 
