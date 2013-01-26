@@ -16,9 +16,15 @@ function st:init()
 
 	self.player = Player (vector(40, 100), vector(32, 32))
 
-	Obstacle (vector(192, 496), vector (64, 256))
-	Obstacle (vector(512, 386), vector (64, 256))
-	Obstacle (vector(386, 256), vector (64, 256))
+        size=180
+        margin=70
+        for i=0,10 do
+            for j=0,10 do
+                if math.random(0,10) > 1 then
+                    Obstacle (vector(i*size+margin, j*size+margin), vector (size-margin, size-margin))
+                end
+            end
+        end
 end
 
 function st:leave()
