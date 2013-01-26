@@ -48,8 +48,12 @@ function st:endContact (a, b, coll)
 	end
 end
 
+local map, geometry
 function st:init()
-	print ("State.game.init()")
+	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
+end
+
+function st:enter()
 	self:resetWorld()
 
 	self.player = Entity.player (vector(40, 100))
@@ -63,7 +67,6 @@ function st:init()
             table.insert(self.cars, car)
         end
 
-	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	cam = Camera()
     cam.scale = 2
 	for rect in pairs(geometry) do
@@ -71,22 +74,49 @@ function st:init()
 	end
 
 	self:addPedestrian (vector(100, 100), 0 )
+
+	self.marker = Entity.questmarker(vector(-100,-100))
+	self.marker:registerPhysics(self.world, 0)
+
+	self.pickup_progress = 0
+	Signal.register('victim-picked-up', function() print("YAY!") self.pickup_progress = 0 end)
+	Signal.register('victim-pickup-timer', function(progress) self.pickup_progress = progress end)
+	Signal.register('victim-pickup-abort', function() self.pickup_progress = 0 end)
 end
 
 function st:leave()
+	Signal.clear('victim-picked-up', 'victim-pickup-timer', 'victim-pickup-abort')
+	Entities.clear()
+	self.player = nil
 end
 
 function st:draw()
 	cam:attach()
-
-	love.graphics.setFont(Font[30])
-	love.graphics.printf("GAME", 0,SCREEN_HEIGHT/4-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-
 	map:draw(cam)
-
 	Entities.draw()
 
+	local ppos = vector(self.player.physics.body:getPosition())
+	local qpos = vector(self.marker.physics.body:getPosition())
+	local dir  = (qpos - ppos):normalize_inplace()
+
+	-- TODO: this in pretty
+	love.graphics.setLine(5, 'smooth')
+	love.graphics.setColor(255,100,100)
+	love.graphics.line(ppos.x+dir.x*40, ppos.y+dir.y*40, (ppos+dir*60):unpack())
+	love.graphics.setColor(255,255,255)
+	love.graphics.setLine(1, 'rough')
+
 	cam:detach()
+
+	if self.pickup_progress > 0 then
+		local p = self.pickup_progress
+		love.graphics.setColor((1-p)*200+55,p*200+55,55)
+		love.graphics.setLine(2, 'smooth')
+		love.graphics.rectangle('line', 10,SCREEN_HEIGHT-40, SCREEN_WIDTH-20, 30)
+		love.graphics.rectangle('fill', 14,SCREEN_HEIGHT-36, p*(SCREEN_WIDTH-28), 22)
+		love.graphics.setLine(1, 'rough')
+		love.graphics.setColor(255,255,255)
+	end
 end
 
 local timeslice = 0
