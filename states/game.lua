@@ -173,6 +173,7 @@ function st:draw()
 		love.graphics.setColor(255,255,255)
 	end
 	love.graphics.draw(Image.heart, SCREEN_WIDTH/2-Image.heart:getHeight(), 0, 0, 2, 2)
+	love.graphics.print(hs.value, SCREEN_WIDTH-20, 0)
 end
 
 function st:update(dt)
