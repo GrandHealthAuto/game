@@ -1,6 +1,6 @@
 local pedestrian = class{name = "Car", inherits = Entity.BaseEntity,
 	function (self, pos, angle, name)
-		Entity.BaseEntity.construct (self, pos, vector(15, 28))
+		Entity.BaseEntity.construct (self, pos, vector(8, 16))
 		self.visual = Image.pedestrian
 		self.name = name
 		self.angle = angle
