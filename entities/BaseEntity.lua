@@ -82,4 +82,10 @@ function base_entity:updateToPhysics()
 	end
 end
 
+function base_entity:finalize()
+	-- dummy timer so we dont destroy the fixture while maybe there are some
+	-- callbacks still pending
+	Timer.add(0, function() self.physics.fixture:destroy() end)
+end
+
 return base_entity
