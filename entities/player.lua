@@ -29,13 +29,15 @@ function player:initSound()
 	self.runningsfx:setLooping(true)
 	self.runningsfx:setVolume(0.2)
 	self.motorspeed = 0.5
+	self.skidfactor = 0.
 	self.runningsfx:setPitch(self.motorspeed)
+	self.squealsfx = Sound.static.squeal:play()
+	self.squealsfx:setVolume(0)
+	self.squealsfx:setLooping(true)
 end
 
 function player:update(dt)
 	self:updateFromPhysics()
-
-	local heading = vector (math.cos(self.angle), math.sin(self.angle))
 
 	local acceleration = vector(0,0)
 
@@ -47,11 +49,7 @@ function player:update(dt)
 		self.velocity.y = 0.
 	end
 
-	local heading = vector(math.cos (self.angle), math.sin (self.angle))
-	local heading_dot_velocity = heading.x * self.velocity.x + heading.y * self.velocity.y
-
--- self.angle_velocity = 0.
-
+	self.heading = vector(math.cos (self.angle), math.sin (self.angle))
 	local rotation_speed_factor = math.min (speed, 320) / 320
 
 	-- 
@@ -69,10 +67,10 @@ function player:update(dt)
 		self.angle_velocity = 0.
 
 		if speed < GVAR["player_accel_max_speed"] then
-			acceleration = heading * GVAR["player_accel"] * 1. 
+			acceleration = self.heading * GVAR["player_accel"] * 1. 
 		else
 			print ("superspeed")
-			acceleration = heading * GVAR["player_accel"] * 1.
+			acceleration = self.heading * GVAR["player_accel"] * 1.
 		end
 	end
 
@@ -86,7 +84,7 @@ function player:update(dt)
 				drag_penalty = (GVAR["player_reverse_max_speed"] - speed) / (dt * math.abs(GVAR["player_reverse"]))
 			end
 
-			acceleration = heading * GVAR["player_reverse"] * drag_penalty 
+			acceleration = self.heading * GVAR["player_reverse"] * drag_penalty 
 		end
 
 		self.angle_velocity = - self.angle_velocity
@@ -106,7 +104,7 @@ function player:update(dt)
 	self.motorspeed = speed / GVAR["player_motor_sound_maxspeed"]
 	self.runningsfx:setPitch(0.5 + self.motorspeed*0.5)
 	self.runningsfx:setVolume(0.05 + self.motorspeed*0.5)
-
+    self.squealsfx:setVolume(self.skidfactor/150)
 	local angle_clamp = 0.05
 
 	if self.angle < 0 then
@@ -127,14 +125,25 @@ function player:update(dt)
 		self.angle = math.pi * 2. 
 	end
 
+	-- sliding detection
+	local tangential_part = self.heading * self.velocity
+	local velocity_ortho = self.velocity - (self.heading * tangential_part)
+	self.skidfactor = math.max (velocity_ortho:len() - GVAR["player_ortho_vel_skid_start"], 0);
+
 	self:updateToPhysics()
 end
 
-function player:beginContact (other, coll)
-end
-
-function player:endContact (other, coll)
-end
-
+-- for debugging of the skidfactor
+--function player:draw()
+--		old_color = {love.graphics.getColor() }
+--
+--		if self.skidfactor > 0 then
+--			love.graphics.setColor(255, 0., 0., 255)
+--		end
+--
+--		Entity.BaseEntity.draw(self)
+--
+--		love.graphics.setColor(old_color)
+--end
 
 return player

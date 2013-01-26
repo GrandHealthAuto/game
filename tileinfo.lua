@@ -35,14 +35,14 @@ return {
         is_rescue_zone = true,
     },
     {
-        name = "hochhaus",
+        name = "hochhaus1",
         is_collision_tile = true
     },
 	{
 		name = "grass"
 	},
 	{
-		name = "hochhausstufe",
+		name = "hochhaus2",
 		is_collision_tile = truer
 	},
 	{

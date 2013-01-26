@@ -139,6 +139,10 @@ function st:enter()
 	Signal.emit('get-next-victim')
 
 	self.heart_monitor = Entity.heartmonitor()
+	
+	self.radio = Sound.static.reggae:play()
+	self.radio:setVolume(0.5)
+	self.radio:setLooping()
 end
 
 function st:leave()
@@ -171,6 +175,11 @@ function st:update(dt)
 	lookahead.x = math.max(math.min(lookahead.x, 200), -200)
 	lookahead.y = math.max(math.min(lookahead.y, 200), -200)
 	cam.target = self.player.pos + lookahead
+	if self.player.heading then
+		cam.rot_target = self.player.heading:cross(self.player.velocity:normalized()) * .03
+		cam.rot_target = math.min(math.max(cam.rot_target, -math.pi/20), math.pi/20)
+		cam.rot = cam.rot + (cam.rot_target - cam.rot) * 5 * dt
+	end
 
 	-- awesome camera zooming
 	--cam:zoomTo(2. -  self.player.velocity:len() * 0.001)

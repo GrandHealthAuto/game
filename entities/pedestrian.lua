@@ -10,6 +10,7 @@ local pedestrian = class{name = "Pedestrian", inherits = Entity.BaseEntity,
 		self.state = 'walk'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
+		self.color = { math.random() * 255, math.random() * 255, math.random() * 255, 255 }
 
 		self.angleSpeed = 10
 		self.rayCastLengthForward = 20

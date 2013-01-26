@@ -9,7 +9,7 @@ local marker = class{name = 'QuestMarker', inherits = Entity.BaseEntity,
 }
 
 function marker:update(dt)
-	self.t = (self.t + dt) % (2 * math.pi)
+	self.t = self.t + dt
 end
 
 function marker:draw()
@@ -17,7 +17,7 @@ function marker:draw()
 	love.graphics.draw(Image.pick_me_up, pos.x,
 		pos.y, 0,1.5,1.5,
 		Image.pick_me_up:getWidth()/2,
-		Image.pick_me_up:getHeight() + (.5 + .5*math.sin(self.t)) * 10)
+		Image.pick_me_up:getHeight() + (.5 + .5*math.sin(self.t*2*math.pi)) * 10 + 5)
 end
 
 function marker:registerPhysics(...)

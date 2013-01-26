@@ -24,6 +24,7 @@ GVAR = {
 	player_reverse = -20. * 32, -- m/s^2
 	player_reverse_max_speed = 15. * 32, -- m/s
 	player_rotation_speed = 220 * math.pi / 180.,
+	player_ortho_vel_skid_start = 150,
 
 	pedestrian_linear_damping = 0.1 * 32,
 	pedestriang_angular_damping = 10,
