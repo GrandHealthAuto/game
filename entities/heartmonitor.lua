@@ -53,7 +53,7 @@ function monitor:update(dt)
 	if self.t >= tmax then
 		self.t = self.t - tmax
 		Tween(.1, self, {scale = 2.3}, 'outBack', function()
-			-- FIXME: heartbeat sound
+			Sound.static.beep:play()
 			Tween(.1, self, {scale = 2}, 'outBack')
 		end)
 	end

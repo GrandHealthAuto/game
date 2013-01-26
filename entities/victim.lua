@@ -20,8 +20,8 @@ function victim:draw()
 end
 
 function victim:update(dt)
-	if self.is_stabilized then
-		self.heartrate = self.heartrate - 30 / 100 * dt -- 30 seconds to flatline
+	if not self.is_stabilized then
+		self.heartrate = self.heartrate - 100 / 30 * dt -- 30 seconds to flatline
 		if self.heartrate <= 0 then
 			Entities.remove(self)
 			State.game.victims[self] = nil
