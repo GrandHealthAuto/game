@@ -29,6 +29,7 @@ function player:initSound()
 	self.runningsfx:setLooping(true)
 	self.runningsfx:setVolume(0.2)
 	self.motorspeed = 0.5
+	self.skidfactor = 0.
 	self.runningsfx:setPitch(self.motorspeed)
 end
 
@@ -127,14 +128,25 @@ function player:update(dt)
 		self.angle = math.pi * 2. 
 	end
 
+	-- sliding detection
+	local tangential_part = heading * self.velocity
+	local velocity_ortho = self.velocity - (heading * tangential_part)
+	self.skidfactor = math.max (velocity_ortho:len() - GVAR["player_ortho_vel_skid_start"], 0);
+
 	self:updateToPhysics()
 end
 
-function player:beginContact (other, coll)
-end
-
-function player:endContact (other, coll)
-end
-
+-- for debugging of the skidfactor
+--function player:draw()
+--		old_color = {love.graphics.getColor() }
+--
+--		if self.skidfactor > 0 then
+--			love.graphics.setColor(255, 0., 0., 255)
+--		end
+--
+--		Entity.BaseEntity.draw(self)
+--
+--		love.graphics.setColor(old_color)
+--end
 
 return player
