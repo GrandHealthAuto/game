@@ -133,11 +133,11 @@ function love.load()
 
 	love.physics.setMeter (32)
 
-	Input.bind{name = 'left',   key = {'left',  'a'}}
-	Input.bind{name = 'right',  key = {'right', 'd'}}
-	Input.bind{name = 'up',     key = {'up',    'w'}}
-	Input.bind{name = 'down',   key = {'down',  's'}}
-	Input.bind{name = 'action', key = {' ', 'enter', 'return'}}
+	Input.bind{name = 'left',   key = {'left',  'a'}, axis = -1}
+	Input.bind{name = 'right',  key = {'right', 'd'}, axis = 1}
+	Input.bind{name = 'up',     key = {'up',    'w'}, axis = -3}
+	Input.bind{name = 'down',   key = {'down',  's'}, axis = 3} 
+	Input.bind{name = 'action', key = {' ', 'enter', 'return'}, button = 1}
 end
 
 function love.update(dt)
