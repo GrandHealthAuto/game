@@ -60,8 +60,8 @@ function st:enter()
 	self.player = Entity.player(map.rescue_zone)
 
 	self.pedestrians = {}
-	for i = 1,30 do
-		local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT))
+	for i = 1,300 do
+		local pos = vector(math.random(0,160 * 32), math.random(0,160 * 32))
 		local pedestrian = Entity.pedestrian (pos, math.random(0,3.1415), "Person " .. i)
 		table.insert(self.pedestrians, pedestrian)
 	end

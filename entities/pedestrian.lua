@@ -127,8 +127,6 @@ function pedestrian:update(dt)
 	self:updateState()
 	self:detectCollision()
 
-	self.state = 'stop'
-
 	if self.state == 'left' then
 		self.angle_velocity = -4
 	elseif self.state == 'right' then
