@@ -16,16 +16,21 @@ function st:init()
 
 	self.player = Player (vector(40, 100), vector(32, 32))
 
-	Obstacle (vector(192, 496), vector (64, 256))
-	Obstacle (vector(512, 386), vector (64, 256))
-	Obstacle (vector(386, 256), vector (64, 256))
-
 	map, geometry = (require 'level-loader')('map.png', {
 		width = 32, height = 32, {name = 'foo'}, {name = 'foo', is_collision_tile = true}
 	}, {texture = 'tiles.png', frames = {
 		{name = 'foo', uvRect = {u0 = 0, v0 = 0, u1 = 1, v1 = 1}}
 	}})
 	cam = Camera()
+	size=180
+	margin=70
+	for i=0,10 do
+		for j=0,10 do
+			if math.random(0,10) > 1 then
+				Obstacle (vector(i*size+margin, j*size+margin), vector (size-margin, size-margin))
+			end
+		end
+	end
 end
 
 function st:leave()
@@ -49,7 +54,7 @@ function st:draw()
 end
 
 function st:update(dt)
---	self.world.update(dt)
+	--	self.world.update(dt)
 	cam:lookAt(self.player.pos:unpack())
 
 	Entities.update(dt)
