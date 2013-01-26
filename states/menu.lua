@@ -13,6 +13,9 @@ function st:enter()
 	Gui.keyboard.cycle.prev = {key = 'select-prev'}
 	Gui.keyboard.cycle.next = {key = 'select-next'}
 	mouse_hot, mouse_x, mouse_y = nil, nil, nil
+
+	Gui.keyboard.setFocus(nil)
+	Gui.mouse.setActive(nil)
 end
 
 function st:update(dt)

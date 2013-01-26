@@ -50,8 +50,7 @@ function st:init()
         self.cars = {}
         for i = 1,30 do
             local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT)) 
-            local car = Entity.car (pos)
-            car.angle = math.random(0, 3.1415)
+            local car = Entity.car (pos, math.random(0,3.1415), "car" .. i)
             table.insert(self.cars, car)
         end
 
@@ -81,10 +80,15 @@ function st:draw()
 	cam:detach()
 end
 
+local timeslice = 0
 function st:update(dt)
 	cam:lookAt(self.player.pos:unpack())
 	if self.world then
-		self.world:update(dt)
+		timeslice = timeslice + dt
+		while timeslice > 1/60 do
+			self.world:update(1/60)
+			timeslice = timeslice - 1/60
+		end
 	end
 
 	Entities.update(dt)
