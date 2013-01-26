@@ -161,8 +161,6 @@ function pedestrian:beginContact (other_entity, contact_point, contact_normal, c
 
 	if impact > GVAR.pedestrian_impact_kill then
 		Signal.emit('pedestrian-killed', self)
-	elseif impact > GVAR.pedestrian_impact_injury then
-		Signal.emit('pedestrian-injured', self)
 	end
 end
 

@@ -28,9 +28,10 @@ end
 -- Entities.draw()
 -- ...
 return setmetatable({
-	add    = add,
-	remove = remove,
-	clear  = clear,
+	register = add,
+	add      = add,
+	remove   = remove,
+	clear    = clear,
 }, {__index = function(_, func)
 	return function(...)
 		for e in pairs(entities) do
