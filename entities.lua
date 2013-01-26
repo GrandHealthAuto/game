@@ -19,8 +19,7 @@ end
 
 local function clear(...)
 	for e in pairs(entities) do
-		(e.onDelete or _NOP_)(e, ...)
-		entities[e] = nil
+		remove(e, ...)
 	end
 end
 
@@ -29,8 +28,9 @@ end
 -- Entities.draw()
 -- ...
 return setmetatable({
-	add      = add,
-	remove   = remove,
+	add    = add,
+	remove = remove,
+	clear  = clear,
 }, {__index = function(_, func)
 	return function(...)
 		for e in pairs(entities) do
