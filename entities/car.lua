@@ -4,6 +4,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.visual = Image.car
 		self.name = name
 		self.angle = angle
+		self.shape_offset = vector(7,0)
 
 		self.speed = 120
 		self.state = 'drive'

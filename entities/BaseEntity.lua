@@ -6,6 +6,7 @@ local base_entity = class{name = "BaseEntity", function (self, pos, dimensions)
 	self.angle_velocity = 0
 	self.mass = self.mass or 0
 	self.physics = {}
+	self.shape_offset = vector(0,0)
 
 	--print ("adding base_entity")
 	Entities.add(self)
@@ -53,7 +54,7 @@ function base_entity:registerPhysics(world)
 	self.physics.body:setLinearDamping (self.linear_damping or 10)
 	self.physics.body:setAngularDamping (self.linear_damping or 10)
 
-	self.physics.shape = self.physics.shape or love.physics.newRectangleShape(0, 0, self.dimensions.x, self.dimensions.y)
+	self.physics.shape = self.physics.shape or love.physics.newRectangleShape(self.shape_offset.x, self.shape_offset.y, self.dimensions:unpack())
 
 	self.physics.fixture = self.physics.fixture or love.physics.newFixture(self.physics.body, self.physics.shape, 1)
 

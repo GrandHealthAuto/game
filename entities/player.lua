@@ -4,6 +4,7 @@ local player = class{name = "Player", inherits = Entity.BaseEntity,
 		self.visual = Image.ambulancebig
 		self.mass = 1
 		self.linear_damping = GVAR.player_linear_damping
+		self.shape_offset = vector(14,0)
 	end
 }
 
