@@ -3,7 +3,7 @@ local dkjson = require "dkjson/dkjson"
 
 local Highscore = {}
 Highscore.__index = Highscore
-Highscore.server = "http://highscore.devedge.eu:82/"
+Highscore.server = "http://highscore.devedge.eu/"
 Highscore.value = 0
 
 
@@ -23,8 +23,7 @@ end
 
 function Highscore:save()
 	b,c,h = http.request(self.server .. "save/", "player=" .. self.name .. "&value=" .. self.value)
-	if c == 200 or b == 1 then return true end
-	
+	if c == 200 or b == 1 then return true end	
 	return false
 end
 
@@ -34,7 +33,6 @@ function Highscore:getHighscore(offset)
 	
 	local obj, pos, err = dkjson.decode (b,1, nil)
 	if err then
-		print ("Error:", err)
 		return false
 	end
 	return obj
