@@ -1,4 +1,4 @@
-local pedestrian = class{name = "Car", inherits = Entity.BaseEntity,
+local pedestrian = class{name = "Pedestrian", inherits = Entity.BaseEntity,
 	function (self, pos, angle, name)
 		Entity.BaseEntity.construct (self, pos, vector(8, 16))
 		self.visual = Image.pedestrian
