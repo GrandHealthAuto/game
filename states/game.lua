@@ -97,8 +97,10 @@ function st:enter()
 	Signal.register('victim-picked-up', function()
 		if self.current_passanger then -- deliver at hospital
 			self.current_passanger = false
+			hs:add(100)
 			Signal.emit('get-next-victim')
 		else -- pick up victim
+			hs:add(50)
 			self.victims[self.current_target] = nil
 			self.current_passanger = self.current_target
 			self.current_passanger:stabilize()
