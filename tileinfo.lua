@@ -32,11 +32,14 @@ return {
     },
     {
         name = "sidewalk",
-		is_rescue_zone = true,
+        is_rescue_zone = true,
+    },
+    {
+        name = "hochhaus",
+        is_collision_tile = true
     },
 	{
-		name = "hochhaus",
-		is_collision_tile = true
+		name = "grass"
 	}
     
 }
