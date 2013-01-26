@@ -56,11 +56,11 @@ function st:enter()
 	end
 
 	cam = Camera()
-    cam.scale = 2
+	cam.scale = 2
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
-	Entity.pedestrian(vector(100, 100), 0)
+	Entity.pedestrian(vector(40, 100), 0)
 
 	self.marker = Entity.questmarker(map.rescue_zone)
 	Entities.registerPhysics(self.world)
