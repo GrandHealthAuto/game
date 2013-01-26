@@ -149,6 +149,10 @@ function st:draw()
 	map:draw(cam)
 	Entities.draw()
 
+	if self.player then
+		self.player:draw()
+	end
+
 	if self.marker then
 		local ppos = vector(self.player.physics.body:getPosition())
 		local qpos = vector(self.marker.physics.body:getPosition())
