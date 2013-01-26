@@ -51,6 +51,7 @@ end
 local map, geometry
 function st:init()
 	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
+	self.map = map
 end
 
 function st:enter()
@@ -68,9 +69,10 @@ function st:enter()
 	-- test pedestrian
 	local pedestrian = Entity.pedestrian (vector(2580, 3120) , 0., "Crash Dummy")
 	table.insert(self.pedestrians, pedestrian)
+	local car = Entity.car (vector(map.rescue_zone.x - 100,map.rescue_zone.y), 0, "Car ")
 
 	cam = Camera()
-	cam.scale = 2
+	cam.scale = 1
 	cam.pos = vector(cam.x, cam.y)
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
@@ -170,6 +172,7 @@ function st:draw()
 		love.graphics.setLine(1, 'rough')
 		love.graphics.setColor(255,255,255)
 	end
+	love.graphics.draw(Image.heart, SCREEN_WIDTH/2-Image.heart:getHeight(), 0, 0, 2, 2)
 end
 
 function st:update(dt)

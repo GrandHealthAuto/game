@@ -148,11 +148,15 @@ return function(map_path, tile_info, tile_data)
 	end
 
 	function map:tileCoords(x,y)
-		return math.floor(x0/TW)+1, math.floor(y0/TH)+1
+		return math.floor(x/TW) + 1, math.floor(y/TH)
+	end
+
+	function map:mapCoords(x, y)
+		return (x - 1) * TW, y * TH, x * TW, (y + 1) * TH
 	end
 
 	function map:cell(i,k)
-		return (map[i] or {})[k]
+		return (self[i] or {})[k] or {}
 	end
 
 	function map:cellAt(x,y)
@@ -160,11 +164,11 @@ return function(map_path, tile_info, tile_data)
 	end
 
 	function map:isStreet(x,y)
-		return self:cell(x,y).is_street
+		return self:cell(x,y).is_street or false
 	end
 
 	function map:isSidewalk(x,y)
-		return self:cell(x,y).is_sidewalk
+		return self:cell(x,y).is_sidewalk or false
 	end
 
 	return map, geometry
