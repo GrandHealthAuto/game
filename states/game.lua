@@ -148,9 +148,13 @@ function st:draw()
 end
 
 function st:update(dt)
-	cam.target    = self.player.pos
+	cam.target    = self.player.pos + self.player.velocity * dt * 40 
+
+	-- awesome camera zooming
+	-- cam:zoomTo(2. -  self.player.velocity:len() * 0.001) 
+
 	cam.direction = cam.target - cam.pos
-	local delta = cam.direction * dt * 5
+	local delta = cam.direction * dt * 4 
 	if math.abs(cam.direction.x) > SCREEN_WIDTH/3 then
 		delta.x = cam.direction.x
 	end
