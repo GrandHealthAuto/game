@@ -31,6 +31,9 @@ function player:initSound()
 	self.motorspeed = 0.5
 	self.skidfactor = 0.
 	self.runningsfx:setPitch(self.motorspeed)
+	self.squealsfx = Sound.static.squeal:play()
+	self.squealsfx:setVolume(0)
+	self.squealsfx:setLooping(true)
 end
 
 function player:update(dt)
@@ -101,7 +104,7 @@ function player:update(dt)
 	self.motorspeed = speed / GVAR["player_motor_sound_maxspeed"]
 	self.runningsfx:setPitch(0.5 + self.motorspeed*0.5)
 	self.runningsfx:setVolume(0.05 + self.motorspeed*0.5)
-
+    self.squealsfx:setVolume(self.skidfactor/150)
 	local angle_clamp = 0.05
 
 	if self.angle < 0 then
