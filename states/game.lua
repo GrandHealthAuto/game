@@ -80,10 +80,15 @@ function st:draw()
 	cam:detach()
 end
 
+local timeslice = 0
 function st:update(dt)
 	cam:lookAt(self.player.pos:unpack())
 	if self.world then
-		self.world:update(dt)
+		timeslice = timeslice + dt
+		while timeslice > 1/60 do
+			self.world:update(1/60)
+			timeslice = timeslice - 1/60
+		end
 	end
 
 	Entities.update(dt)
