@@ -43,7 +43,7 @@ return {
 	},
 	{
 		name = "hochhausstufe",
-		is_collision_tile = true
+		is_collision_tile = truer
 	}
     
 }
