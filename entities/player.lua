@@ -8,12 +8,18 @@ local player = class{inherits = BaseEntity,
 }
 
 function player:update(dt)
+	self:updateFromPhysics()
+
 	local heading = vector (math.cos(self.angle), math.sin(self.angle))
 
 	self.velocity = vector (0, 0)
 
 	if self.controls.accelerate then
 		self.velocity = heading * 128
+	end
+
+	if self.controls.reverse then
+		self.velocity = heading * -16
 	end
 
 	self.angle_velocity = 0
@@ -28,10 +34,16 @@ function player:update(dt)
 
 	self.pos = self.pos + dt * self.velocity	
 	self.angle = self.angle + dt * self.angle_velocity
+
+	self:updateToPhysics()
 end
 
 function player:accelerate(state)
 	self.controls.accelerate = state
+end
+
+function player:reverse(state)
+	self.controls.reverse = state
 end
 
 function player:turn_left(state)

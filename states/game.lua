@@ -7,7 +7,9 @@ function st:resetWorld()
 	print ("resetting world")
 end
 
-function st:addObstacle (pos, dimensions)
+function st:addObstacle(pos, dimensions)
+	local obstacle = 	Obstacle (pos, dimensions)
+	obstacle:registerPhysics (self.world, 0.)
 end
 
 function st:init()
@@ -15,6 +17,7 @@ function st:init()
 	self:resetWorld()
 
 	self.player = Player (vector(40, 100), vector(32, 32))
+	self.player:registerPhysics (self.world, 1.)
 
 	map, geometry = (require 'level-loader')('map.png', {
 		width = 32, height = 32, {name = 'foo'}, {name = 'foo', is_collision_tile = true}
@@ -22,14 +25,9 @@ function st:init()
 		{name = 'foo', uvRect = {u0 = 0, v0 = 0, u1 = 1, v1 = 1}}
 	}})
 	cam = Camera()
-	size=180
-	margin=70
-	for i=0,10 do
-		for j=0,10 do
-			if math.random(0,10) > 1 then
-				Obstacle (vector(i*size+margin, j*size+margin), vector (size-margin, size-margin))
-			end
-		end
+
+	for rect in pairs(geometry) do
+		self:addObstacle (vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
 end
 
@@ -44,9 +42,6 @@ function st:draw()
 	love.graphics.printf("GAME", 0,SCREEN_HEIGHT/4-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
 
 	map:draw(cam)
-	for rect in pairs(geometry) do
-		love.graphics.rectangle('line', rect.x-3, rect.y-3, rect.w-6, rect.h-6)
-	end
 
 	Entities.draw()
 
@@ -54,8 +49,10 @@ function st:draw()
 end
 
 function st:update(dt)
-	--	self.world.update(dt)
 	cam:lookAt(self.player.pos:unpack())
+	if self.world then
+		self.world:update(dt)
+	end
 
 	Entities.update(dt)
 end
@@ -68,6 +65,8 @@ function st:keypressed(key)
 	if self.player then
 		if key == 'up' then
 			self.player:accelerate(true)
+		elseif key == 'down' then
+			self.player:reverse(true)
 		elseif key == 'left' then
 			self.player:turn_left(true)
 		elseif key == 'right' then
@@ -80,6 +79,8 @@ function st:keyreleased(key)
 	if self.player then
 		if key == 'up' then
 			self.player:accelerate(nil)
+		elseif key == 'down' then
+			self.player:reverse(nil)
 		elseif key == 'left' then
 			self.player:turn_left(nil)
 		elseif key == 'right' then
