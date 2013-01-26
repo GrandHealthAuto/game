@@ -12,6 +12,7 @@ function st:resetWorld()
 		function(a, b, coll) self:beginContact (a, b, coll) end,
 		function(a, b, coll) self:endContact (a, b, coll) end
 		)
+	hs:set(0)
 	print ("resetting world")
 end
 
