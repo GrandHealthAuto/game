@@ -123,8 +123,8 @@ function player:update(dt)
 	end
 
 	-- sliding detection
-	local tangential_part = heading * self.velocity
-	local velocity_ortho = self.velocity - (heading * tangential_part)
+	local tangential_part = self.heading * self.velocity
+	local velocity_ortho = self.velocity - (self.heading * tangential_part)
 	self.skidfactor = math.max (velocity_ortho:len() - GVAR["player_ortho_vel_skid_start"], 0);
 
 	self:updateToPhysics()
