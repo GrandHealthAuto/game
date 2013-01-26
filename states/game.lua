@@ -161,6 +161,20 @@ function st:enter()
 	self.radio = Sound.static.reggae:play()
 	self.radio:setVolume(0.5)
 	self.radio:setLooping()
+	st.sirensfx = false
+end
+
+function st:mappingDown(mapping)
+	if mapping == 'action' then
+	    if not st.sirensfx then
+            Sound.static.siren:setVolume(0.2)
+            Sound.static.siren:setLooping(true)
+            st.sirensfx = Sound.static.siren:play() 
+        else
+            st.sirensfx:stop()
+            st.sirensfx = false
+        end
+    end
 end
 
 function st:leave()
