@@ -1,6 +1,6 @@
 local marker = class{name = 'QuestMarker', inherits = Entity.BaseEntity,
 	function (self, pos, radius)
-		Entity.BaseEntity.construct(self, pos, vector(128,128))
+		Entity.BaseEntity.construct(self, pos:clone(), vector(128,128))
 		--self.visual = Image.victim
 
 		self.physics.shape = love.physics.newCircleShape(radius or 64)
@@ -16,7 +16,7 @@ function marker:beginContact(other)
 	if other ~= State.game.player then return end
 	self.playerInRange = true
 	local t = 0
-	Timer.do_for(2, function(dt)
+	self.countown_timer = Timer.do_for(2, function(dt)
 		t = t + dt
 		Signal.emit('victim-pickup-timer', t / 2)
 	end, function()
@@ -30,6 +30,7 @@ end
 function marker:endContact(other)
 	if other ~= State.game.player then return end
 	self.playerInRange = false
+	Timer.cancel(self.countown_timer)
 	Signal.emit('victim-pickup-abort')
 end
 

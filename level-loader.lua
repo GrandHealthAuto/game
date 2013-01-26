@@ -66,7 +66,7 @@ return function(map_path, tile_info, tile_data)
 	local collision_boxes = {}
 	local TW, TH = tile_info.width, tile_info.height
 
-	local map = {atlas = atlas}
+	local map = {atlas = atlas, rescue_zone = vector(0,0)}
 	for y = 1,image_data:getHeight()-1 do
 		local row = {}
 		collision_boxes[y] = {}
@@ -75,6 +75,10 @@ return function(map_path, tile_info, tile_data)
 			local tile = tile_info[color_to_tile[hex]] or {}
 			if tile.name then
 				row[x+1] = quads[tile.name]
+			end
+			if tile.name == 'rescue_zone' then
+				map.rescue_zone.x = (x+.5) * TW
+				map.rescue_zone.y = (y-.5) * TH
 			end
 
 			if tile.is_collision_tile then

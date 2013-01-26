@@ -62,13 +62,30 @@ function st:enter()
 	end
 	Entity.pedestrian(vector(100, 100), 0)
 
+	self.victim_on_board = false
 	self.marker = Entity.questmarker(vector(-100,-100))
 	Entities.registerPhysics(self.world)
 
 	self.pickup_progress = 0
-	Signal.register('victim-picked-up', function() print("YAY!") self.pickup_progress = 0 end)
-	Signal.register('victim-pickup-timer', function(progress) self.pickup_progress = progress end)
-	Signal.register('victim-pickup-abort', function() self.pickup_progress = 0 end)
+	Signal.register('victim-picked-up', function()
+		if self.victim_on_board then
+			-- delivered at hospital
+			self.victim_on_board = false
+			self.marker = Entity.questmarker(map.rescue_zone)
+		else
+			-- victim picked up
+			self.victim_on_board = true
+			-- TODO: next victim
+			self.marker = Entity.questmarker(vector(math.random(0,0, #map[1]*32, #map*32)))
+		end
+		self.pickup_progress = 0
+	end)
+	Signal.register('victim-pickup-timer', function(progress)
+		self.pickup_progress = progress
+	end)
+	Signal.register('victim-pickup-abort', function()
+		self.pickup_progress = 0
+	end)
 end
 
 function st:leave()
