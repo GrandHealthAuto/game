@@ -38,19 +38,7 @@ function st:update(dt)
 		
 		Gui.group.pop()
 		
-		Gui.group.push{ grow="right", size={ 300, 30}, pos={10,10} }
-			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
-		Gui.group.pop{}
-				
-		if hsData then
-			for i, player in pairs(hsData) do
-				Gui.group.push{ grow="right", size={ 300, 30}, pos={10,0} }
-					Gui.Label{text=player["rank"], size={100, 30}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
-				Gui.group.pop{}
-			end
-		else
-			Gui.Label{text="The highscore server is currently not reachable"}
-		end
+		drawHighscore(hsData)
 		
 		if Gui.Button{text="Back"} then
 			GS.switch(State.menu)
@@ -85,6 +73,22 @@ function st:mappingDown(mapping)
 	Gui.mouse.setHot(Gui.keyboard.getFocus())
 	mouse_hot = Gui.mouse.getHot()
 	-- FIXME: play sound
+end
+
+function drawHighscore(hsd)
+		Gui.group.push{ grow="right", size={ 300, 30}, pos={10,10} }
+			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
+		Gui.group.pop{}
+				
+		if hsd then
+			for i, player in pairs(hsData) do
+				Gui.group.push{ grow="right", size={ 300, 30}, pos={10,0} }
+					Gui.Label{text=player["rank"], size={100, 30}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
+				Gui.group.pop{}
+			end
+		else
+			Gui.Label{text="The highscore server is currently not reachable"}
+		end
 end
 
 return st

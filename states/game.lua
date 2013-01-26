@@ -1,6 +1,6 @@
 local highscore = require "highscore"
 local hs = highscore(GVAR['player_name'])
-
+local hsData= hs:getHighscore(0)
 local st = GS.new()
 
 st.world = {}
