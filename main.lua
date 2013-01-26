@@ -28,6 +28,8 @@ GVAR = {
 	pedestriang_angular_damping = 10,
 	pedestrian_impact_injury = 3000,
 	pedestrian_impact_kill = 6000,
+	
+	player_name ="Player One"
 }
 
 function serialize(t, indent)
