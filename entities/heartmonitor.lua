@@ -16,7 +16,9 @@ end
 
 function monitor:update(dt)
 	self.t = self.t + dt
-	local tmax = 60 / State.game.current_target.heartrate
+	local victim = (State.game.current_target or State.game.current_passanger)
+	if not victim then return end
+	local tmax = 60 / victim.heartrate
 	if self.t >= tmax then
 		self.t = self.t - tmax
 		Tween(.1, self, {scale = 2.3}, 'outBack', function()
