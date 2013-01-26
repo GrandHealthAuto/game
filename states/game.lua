@@ -57,7 +57,7 @@ function st:init()
 
 	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	cam = Camera()
-
+    cam.scale = 2
 	for rect in pairs(geometry) do
 		self:addObstacle (vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
