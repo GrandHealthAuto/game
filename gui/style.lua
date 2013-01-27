@@ -26,9 +26,9 @@ THE SOFTWARE.
 
 -- default style
 local color = {
-	normal = {bg = {0,0,0,0},  fg = {200,200,200}, border={12,0,1}},
-	hot    = {bg = {122,0,10}, fg = {255,255,255}, border={12,0,1}},
-	active = {bg = {122,0,10}, fg = {255,255,255}, border={12,0,1}}
+	normal = {bg = {0,0,0,0},  fg = {200,200,200}, border={12,0,1,0}},
+	hot    = {bg = {122,0,10}, fg = {255,255,255}, border={12,0,1,0}},
+	active = {bg = {122,0,10}, fg = {255,255,255}, border={12,0,1,0}}
 }
 
 -- box drawing

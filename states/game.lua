@@ -2,6 +2,7 @@ local highscore = require "highscore"
 local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
+local hsData = nil
 st.world = {}
 
 function st:resetWorld()
@@ -99,7 +100,7 @@ function st:init()
 	
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
-		-- hs:add(-100)
+        hs:add(-5)
 		Sound.static["shout"..math.random(7)]:play():setVolume(0.5)
 		local v = Entity.victim(pedestrian.pos)
 		v.color = pedestrian.color
@@ -110,6 +111,7 @@ function st:init()
 	-- game-over
 	Signal.register('game-over', function (reason)
 		hs:save()
+		hsData = hs:getHighscore(0)
 		love.audio.stop()
 
 		local continue
@@ -147,7 +149,6 @@ function st:init()
 end
 
 function st:spawn_target()
-	print ("spawned target")
 
 	-- rotated bounding box
 	local xul,yul = self.cam:worldCoords(-SCREEN_WIDTH,-SCREEN_HEIGHT)
@@ -169,6 +170,8 @@ function st:spawn_target()
 	until self.map:cell(p.x,p.y).is_walkable and (p.x < x0 or p.x > x1) and (p.y < y0 or p.y > y1)
 
 	local v = Entity.victim(p*32-vector(16,16))
+--	local v = Entity.victim(self.player.pos + vector(400))
+	v:init_heartrate_delta()
 	self.victims[v] = v
 	self.current_target = v
 	Signal.emit('get-next-victim')
@@ -327,7 +330,6 @@ function showHighscore()
 
 	local height = 160;
 	love.graphics.printf("- Highscore -", 0,height, SCREEN_WIDTH, 'center')
-	hsData = hs:getHighscore(0)
 	for i, player in pairs(hsData) do
 		height = height +20
 		love.graphics.printf(player["value"],SCREEN_WIDTH /4 - 30,height, SCREEN_WIDTH /4, 'right' )

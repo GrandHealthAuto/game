@@ -35,17 +35,18 @@ function st:update(dt)
 	t = t + dt
 	love.graphics.setFont(Font.XPDR[16])
 	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .6}}
-	if Gui.Button{text="Start"} then
+	if Gui.Button{text="START"} then
 		self.music:stop()
 		self.music = false
 		GS.transition(1, State.entername)
 	end
-	if Gui.Button{text="Highscore"} then
+	if Gui.Button{text="HIGHSCORES"} then
 		GS.transition(.5, State.highscore)
 	end
-	if Gui.Button{text="Options"} then
+	if Gui.Button{text="CREDITS"} then
+		GS.transition(.5, State.credits)
 	end
-	if Gui.Button{text="Quit"} then
+	if Gui.Button{text="QUIT"} then
 		love.event.push('quit')
 	end
 
