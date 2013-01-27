@@ -1,7 +1,7 @@
 local Gui = require "Quickie"
 local st = GS.new()
 local mouse_hot, mouse_x, mouse_y
-local inputInfo={text=GVAR["player_name"]}
+local inputInfo={text=""}
 function st:enter()
 	Gui.core.style = require 'gui.style'
 	Gui.group.default.size[1] = SCREEN_WIDTH
@@ -21,14 +21,16 @@ function st:update(dt)
 	t = t + dt
 	love.graphics.setFont(Font.XPDR[16])
 
-	Gui.group.push{grow = "down", pos={SCREEN_WIDTH/2-Gui.group.default.size[1]/2,SCREEN_HEIGHT/2}}
-		Gui.Label{text="Please enter your name and press >>Start<<"}
+	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-500,40}, pos = {SCREEN_WIDTH/2-250,SCREEN_HEIGHT * .6}}
+		Gui.Label{text="What should I call you?"}
 		Gui.Input{info = inputInfo}
-		if Gui.Button{text="Start"} then
-			GVAR['player_name'] = inputInfo["text"]
-			GS.transition(.5, State.game)
+		if inputInfo.text ~= '' then
+			if Gui.Button{text="Start"} then
+				GVAR['player_name'] = inputInfo["text"]
+				GS.transition(.5, State.game)
+			end
 		end
-	Gui.group.pop{}
+		Gui.group.pop{}
 	-- on mouse move -> set widget focus to mouse
 	if mouse_hot ~= Gui.mouse.getHot() then
 		Gui.keyboard.setFocus(Gui.mouse.getHot() or Gui.keyboard.getFocus())
