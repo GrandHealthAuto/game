@@ -44,7 +44,7 @@ function st:update(dt)
 			end
 		end}
 		if Gui.Button{text="BACK"} then
-			GS.transition(.5, State.menu)
+			GS.switch(State.menu)
 		end
 	end}
 

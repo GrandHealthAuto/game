@@ -38,10 +38,10 @@ function st:update(dt)
 	if Gui.Button{text="START"} then
 		self.music:stop()
 		self.music = false
-		GS.transition(1, State.entername)
+		GS.switch(State.entername)
 	end
 	if Gui.Button{text="HIGHSCORES"} then
-		GS.transition(.5, State.highscore)
+		GS.switch(State.highscore)
 	end
 	if Gui.Button{text="CREDITS"} then
 		GS.transition(.5, State.credits)
