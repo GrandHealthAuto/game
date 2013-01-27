@@ -211,10 +211,10 @@ function car:searchStreet(map, pos, v)
 	-- search each tile for maximum distance
 	local distance = 5
 	-- search in front
-	for i = 0,distance do
+	for i = 1,distance do
 		local probe = pos + i*v
 		if map:isStreet(probe.x, probe.y) then
-			return map:mapCoordsCenter(ahead4.x, ahead4.y)
+			return map:mapCoordsCenter(probe.x, probe.y)
 		elseif not map:isStreet(probe.x, probe.y) then
 			break
 		end
@@ -222,7 +222,7 @@ function car:searchStreet(map, pos, v)
 
 	local rV = v:rotated(math.pi / 2)
 	-- search to the right
-	for i = 0,distance do
+	for i = 1,distance do
 		local probe = pos + i*rV
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getRightDirection(self.direction)
@@ -233,7 +233,7 @@ function car:searchStreet(map, pos, v)
 	end
 
 	-- search to the left
-	for i = 0,distance do
+	for i = 1,distance do
 		local probe = pos - i*rV
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getLeftDirection(self.direction)
@@ -244,7 +244,7 @@ function car:searchStreet(map, pos, v)
 	end
 
 	-- search to the back
-	for i = 0,distance do
+	for i = 1,distance do
 		local probe = pos - i*V
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
@@ -287,7 +287,7 @@ function car:findNextTarget(map, pos, v)
 		table.insert(changes, {name = 'left', target = target, direction = self:getLeftDirection(self.direction)})
 	end
 	if #changes == 0 then
-		return map:searchStreet(map, pos, v)
+		return self:searchStreet(map, pos, v)
 	end
 	local i = math.floor(math.random(0, #changes - 1)) + 1
 	--self:log("length " .. #changes .. " i " .. i)
@@ -302,7 +302,11 @@ end
 -- north-east, north-west, south-east, south-west directions
 function car:getTargetPosition()
 	local map = State.game.map
-	local x, y = map:tileCoords(self.pos.x, self.pos.y)
+
+	-- get tile of car front
+	local heading = vector (math.cos(self.angle), math.sin(self.angle))
+	local offset = self.pos + heading * 20
+	local x, y = map:tileCoords(offset.x, offset.y)
 
 	if self.state ~= 'drive' then
 		self.targetPos = self.pos
