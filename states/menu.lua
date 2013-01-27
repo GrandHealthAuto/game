@@ -36,9 +36,9 @@ local t = 0
 function st:update(dt)
 	t = t + dt
 	love.graphics.setFont(Font.XPDR[16])
-	Gui.group.push{grow = "down", size = {500,40}, pos = {SCREEN_WIDTH/2-100,SCREEN_HEIGHT * .6}}
+	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .6}}
 	if Gui.Button{text="Start"} then
-		self.music:stop()
+		self.music:pause()
 		GS.transition(1, State.game)
 	end
 	if Gui.Button{text="Highscore"} then
@@ -76,7 +76,7 @@ function st:draw()
 		math.cos(.021*t)*.05, 1,1, w/2,h/2)
 	love.graphics.draw(Image.logo, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, math.sin(.021*t)*.05, .8, .8, lw/2,lh/2)
 	love.graphics.setColor(122,0,10)
-	love.graphics.rectangle('fill', 0,SCREEN_HEIGHT/4-lh*.5, SCREEN_WIDTH,7)
+	love.graphics.rectangle('fill', 0,SCREEN_HEIGHT/4-lh*.5-2, SCREEN_WIDTH,9)
 	love.graphics.rectangle('fill', 0,SCREEN_HEIGHT/4+lh*.5-7, SCREEN_WIDTH,7)
 	love.graphics.setScissor()
 	Gui.core.draw()
