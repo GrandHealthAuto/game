@@ -27,6 +27,7 @@ local notification = class{name = "notification",
 		self.text = "BRING EM HOME"
 		self.color = {255, 255, 255, 255}
 		self.subtext = "to the hospital"
+		Sound.static.closecar:play()
 		self.pos = vector(SCREEN_WIDTH/2-self.w/2, SCREEN_HEIGHT/4)
 		Tween(self.duration, self.color, {self.color[1],self.color[2],self.color[3],0})
 	    Tween(self.duration, self.pos, {y = 100}, 'outSine')
