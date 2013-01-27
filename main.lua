@@ -156,7 +156,7 @@ function love.load()
 	love.physics.setMeter (32)
 
 	Input.bind{name = 'left',   key = {'left'}, axis = -1}
-	Input.bind{name = 'right',  key = {'right', axis = 1}
+	Input.bind{name = 'right',  key = {'right'}, axis = 1}
 	Input.bind{name = 'up',     key = {'up'}, axis = {-2}}
 	Input.bind{name = 'down',   key = {'down'}, axis = {2}}
 	Input.bind{name = 'accelerate', key = {'up'}, axis = {-3}}
