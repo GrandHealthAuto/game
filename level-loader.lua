@@ -169,10 +169,11 @@ return function(map_path, tile_info, tile_data)
 	end
 
 	-- Adjust position to be within the map
-	function map:adjustInboundPos(pos, margin)
+	function map:adjustInboundPos(pos, cam)
 		local worldWidth, worldHeight = self:mapCoordsMax()
-		local x = math.min(math.max(pos.x, margin), worldWidth - margin)
-		local y = math.min(math.max(pos.y, margin), worldHeight - margin)
+		local w,h = SCREEN_WIDTH/2 / cam.scale - TW, SCREEN_HEIGHT/2 / cam.scale - TH
+		local x = math.min(math.max(pos.x, w), worldWidth - w)
+		local y = math.min(math.max(pos.y, h), worldHeight - h)
 		return vector(x, y)
 	end
 
