@@ -32,7 +32,7 @@ local notification = class{name = "notification",
 	    Tween(self.duration, self.pos, {y = 100}, 'outSine')
 	end)
 	
-	Signal.register ('victim-deliviered', function()
+	Signal.register ('victim-delivered', function()
 		self.oldfont = love.graphics.getFont()
 		self.text = "$$$"
 		self.color = {255, 255, 255, 255}
