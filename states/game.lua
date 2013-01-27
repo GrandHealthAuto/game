@@ -272,22 +272,9 @@ function st:update(dt)
 	Entities.update(dt)
 end
 
-function st:showHighscore()
-	local continue
-	continue = Interrupt{
-		draw = function(draw)
-			love.graphics.printf("HIGHSCORE", 0,SCREEN_HEIGHT/4-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-			draw()
-		end, update = function() Input.update() end,
-	}
-
-	local mappingDown = Input.mappingDown
-	Input.mappingDown = function(mapping, mag)
-		if mapping == 'action' then
-			continue()
-			Input.mappingDown = mappingDown
-		end
-	end
+function showHighscore()
+	local height = SCREEN_HEIGHT/4-Font[30]:getLineHeight();
+	love.graphics.printf("HIGHSCORE", 0,,SCREEN_WIDTH, 'center')
 end 
 
 return st
