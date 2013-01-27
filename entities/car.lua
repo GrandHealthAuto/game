@@ -207,53 +207,78 @@ end
 -- map: current tile map
 -- pos: current tile map position
 -- v: current direction on tile map
-function car:searchStreet(map, pos, v)
+-- from: start tile offset
+-- to: end tile offset
+function car:searchStreetCircle(map, pos, v, from, to)
 	-- search each tile for maximum distance
-	local distance = 5
 	-- search in front
-	for i = 1,distance do
+	for i = from,to do
 		local probe = pos + i*v
+		self:log("probe ahead " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
 
 	local rV = v:rotated(math.pi / 2)
 	-- search to the right
-	for i = 1,distance do
+	for i = from,to do
 		local probe = pos + i*rV
+		self:log("probe right " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getRightDirection(self.direction)
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
 
 	-- search to the left
-	for i = 1,distance do
+	for i = from,to do
 		local probe = pos - i*rV
+		self:log("probe left " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getLeftDirection(self.direction)
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
 
 	-- search to the back
-	for i = 1,distance do
-		local probe = pos - i*V
+	for i = from,to do
+		local probe = pos - i*v
+		self:log("probe back " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
+	return nil
+end
+
+-- Search for a street on tile map and return game coordinates by enlarging
+-- search circles
+--
+-- map: current tile map
+-- pos: current tile map position
+-- v: current direction on tile map
+function car:searchStreet(map, pos, v)
+	for distance = 1,20,3 do
+		local target = self:searchStreetCircle(map, pos, v, 1, distance)
+		if target then
+			return target
+		end
+	end
+
 	self:log('Panic: Do not know where to go')
+	local probe = pos - v
+	self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
+	return map:mapCoordsCenter(probe.x, probe.y)
 end
 
 -- map: current tile map
