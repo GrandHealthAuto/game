@@ -110,6 +110,8 @@ function st:init()
 	-- game-over
 	Signal.register('game-over', function (reason)
 		hs:save()
+		love.audio.stop()
+
 		local continue
 		continue = Interrupt{
 			draw = function(draw)
