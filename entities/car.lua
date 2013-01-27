@@ -10,7 +10,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
-		
+
 		self.physics.shape = love.physics.newPolygonShape(
 			-24 + 10,  8,
 			-21 + 10,  11,
@@ -23,14 +23,14 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		)
 		self.direction = 'south'
 		self.hitList = {}
-		self.debug = false
+		self.debug = true
 	end
 }
 
 -- get collision lines
-function car:getCollisionLines() 
+function car:getCollisionLines()
 	local lines = {}
-	
+
 	local xV = vector (math.cos(self.angle), math.sin(self.angle))
 	local yV = xV:rotated(math.pi / 2)
 
@@ -85,10 +85,10 @@ function car:updateStateMachine()
 		local now = love.timer.getMicroTime()
 		if #self.hitList == 0 then
 			self:setState('drive')
-		elseif now - self.lastStateUpdate > 3 then 
+		elseif now - self.lastStateUpdate > 3 then
 			if math.random(0, 2) < 1 then
 				self:setState('reverseLeft')
-			else 
+			else
 				self:setState('reverseRight')
 			end
 		end
@@ -103,7 +103,7 @@ end
 -- Return angle between two points
 function car:getAngle(p1, p2)
 	local d = p2 - p1
-	
+
 	local angle = math.atan2(d.y, d.x)
 	--if angle < 0 then
 	--	angle = angle + 2 * math.pi
@@ -111,7 +111,7 @@ function car:getAngle(p1, p2)
 	return angle
 end
 
-function car:updatePosition(dt, angle) 
+function car:updatePosition(dt, angle)
 	local heading = vector (math.cos(angle), math.sin(angle))
 	local angleD = angle - self.angle
 	while (angleD > math.pi) do
@@ -121,7 +121,7 @@ function car:updatePosition(dt, angle)
 		angleD = angleD + 2 * math.pi
 	end
 	--self:log("self:angle="..self.angle.." angle="..angle)
-	
+
 	self.velocity = vector(0, 0)
 
 	if self.state == 'drive' then
@@ -131,7 +131,7 @@ function car:updatePosition(dt, angle)
 		self.velocity = vector(0, 0)
 	elseif self.state == 'reverseLeft' then
 		self.velocity = heading * self.speed * -0.5
-		self.angle_velocity = math.pi 
+		self.angle_velocity = math.pi
 	elseif self.state == 'reverseRight' then
 		self.velocity = heading * self.speed * -0.5
 		self.angle_velocity = - math.pi
@@ -152,12 +152,12 @@ end
 
 function car:canDriveAhead(map, pos, v)
 	local rV = v:rotated(math.pi / 2)
-	
+
 	local ahead = pos + v
 	local right = pos + rV
 	-- self:log("pos=" .. pos.x .. ","..pos.y.." v=" .. v.x .. ","..v.y.." ahead="..ahead.x..","..ahead.y.." right="..right.x..","..right.y)
 	-- self:log("isStreet ahead " .. tostring(map:isStreet(ahead.x, ahead.y)) .. "right ahead " .. tostring(map:isStreet(right.x, right.y)))
-	
+
 	-- normal stret
 	if map:isStreet(ahead.x, ahead.y) and not map:isStreet(right.x, right.y) then
 		self:log("Hit ahead!")
@@ -202,6 +202,63 @@ function car:getRightDirection()
 	end
 end
 
+-- Search for a street on tile map and return game coordinates
+--
+-- map: current tile map
+-- pos: current tile map position
+-- v: current direction on tile map
+function car:searchStreet(map, pos, v)
+	-- search each tile for maximum distance
+	local distance = 5
+	-- search in front
+	for i = 0,distance do
+		local probe = pos + i*v
+		if map:isStreet(probe.x, probe.y) then
+			return map:mapCoordsCenter(ahead4.x, ahead4.y)
+		elseif not map:isStreet(probe.x, probe.y) then
+			break
+		end
+	end
+
+	local rV = v:rotated(math.pi / 2)
+	-- search to the right
+	for i = 0,distance do
+		local probe = pos + i*rV
+		if map:isStreet(probe.x, probe.y) then
+			self.direction = self:getRightDirection(self.direction)
+			return map:mapCoordsCenter(probe.x, probe.y)
+		elseif not map:isStreet(probe.x, probe.y) then
+			break
+		end
+	end
+
+	-- search to the left
+	for i = 0,distance do
+		local probe = pos - i*rV
+		if map:isStreet(probe.x, probe.y) then
+			self.direction = self:getLeftDirection(self.direction)
+			return map:mapCoordsCenter(probe.x, probe.y)
+		elseif not map:isStreet(probe.x, probe.y) then
+			break
+		end
+	end
+
+	-- search to the back
+	for i = 0,distance do
+		local probe = pos - i*V
+		if map:isStreet(probe.x, probe.y) then
+			self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
+			return map:mapCoordsCenter(probe.x, probe.y)
+		elseif not map:isStreet(probe.x, probe.y) then
+			break
+		end
+	end
+	self:log('Panic: Do not know where to go')
+end
+
+-- map: current tile map
+-- pos: current tile map position
+-- v: current direction on tile map
 function car:findNextTarget(map, pos, v)
 	local lV = v:rotated(- math.pi / 2)
 	local rV = v:rotated(math.pi / 2)
@@ -230,21 +287,7 @@ function car:findNextTarget(map, pos, v)
 		table.insert(changes, {name = 'left', target = target, direction = self:getLeftDirection(self.direction)})
 	end
 	if #changes == 0 then
-		if map:isStreet(ahead4.x, ahead4.y) then
-			self:log("Find next target: Faild but street ahead")
-			return map:mapCoordsCenter(ahead4.x, ahead4.y)
-		elseif map:isStreet(right4.x, right4.y) then
-			self:log("Find next target: Faild but street right")
-			return map:mapCoordsCenter(right4.x, right4.y)
-		elseif map:isStreet(left4.x, left4.y) then
-			self:log("Find next target: Faild but street left")
-			return map:mapCoordsCenter(left4.x, left4.y)
-		else 
-			self:log("Find next target: Must return")
-			self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
-			local reverse = pos - v
-			return map:mapCoordsCenter(reverse.x, reverse.y)
-		end
+		return map:searchStreet(map, pos, v)
 	end
 	local i = math.floor(math.random(0, #changes - 1)) + 1
 	--self:log("length " .. #changes .. " i " .. i)
@@ -255,12 +298,12 @@ function car:findNextTarget(map, pos, v)
 	return map:mapCoordsCenter(changes[i].target.x, changes[i].target.y)
 end
 
--- Returns new direction. One of north, east, south, west, 
+-- Returns new direction. One of north, east, south, west,
 -- north-east, north-west, south-east, south-west directions
 function car:getTargetPosition()
 	local map = State.game.map
 	local x, y = map:tileCoords(self.pos.x, self.pos.y)
-	
+
 	if self.state ~= 'drive' then
 		self.targetPos = self.pos
 		return self.pos
@@ -308,7 +351,7 @@ function car:draw()
 		local lines = self:getCollisionLines()
 		for i = 1,#lines do
 			love.graphics.line(lines[i].x1, lines[i].y1, lines[i].x2, lines[i].y2)
-		end	
+		end
 
 		local crossSize = 5
 		for i = 1,#self.hitList do
