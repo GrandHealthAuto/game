@@ -30,3 +30,11 @@ a preferred directory. Then run
 
     $ cd <unzip GHA dir file>
     $ love .
+
+
+Gamepad
+------------
+
+The game supports the use of gamepads such as the Microsoft Xbox 360 Controller for Windows,
+however it has only been tested successfully with that model, other models are likely to have
+weird control styles due to different axis/button numbers / axis/button configurations
