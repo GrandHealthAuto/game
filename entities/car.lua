@@ -8,6 +8,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.targetPos = pos
 		self.speed = 40
 		self.speedMultiplier = 1
+		self.speedReverse = 150
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
@@ -140,10 +141,10 @@ function car:updatePosition(dt, angle)
 	elseif self.state == 'pause' then
 		self.velocity = vector(0, 0)
 	elseif self.state == 'reverseLeft' then
-		self.velocity = heading * self.speed * -0.5
+		self.velocity = heading * self.speedReverse * -1
 		self.angle_velocity = math.pi
 	elseif self.state == 'reverseRight' then
-		self.velocity = heading * self.speed * -0.5
+		self.velocity = heading * self.speedReverse * -1
 		self.angle_velocity = - math.pi
 	end
 end
