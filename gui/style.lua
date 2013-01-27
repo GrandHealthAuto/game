@@ -26,9 +26,9 @@ THE SOFTWARE.
 
 -- default style
 local color = {
-	normal = {bg = {78,78,78,0}, fg = {200,200,200}, border={20,20,20}},
-	hot    = {bg = {98,98,98,100}, fg = {69,201,84},   border={30,30,30}},
-	active = {bg = {88,88,88}, fg = {49,181,64},   border={10,10,10}}
+	normal = {bg = {0,0,0,0},  fg = {200,200,200}, border={12,0,1}},
+	hot    = {bg = {122,0,10}, fg = {255,255,255}, border={12,0,1}},
+	active = {bg = {122,0,10}, fg = {255,255,255}, border={12,0,1}}
 }
 
 -- box drawing
@@ -40,7 +40,7 @@ function gradient:set(from, to)
 	gradient.img = love.graphics.newImage(id)
 	gradient.img:setFilter('linear', 'linear')
 end
-gradient:set(200,255)
+gradient:set(255,255)
 
 local function box(x,y,w,h, bg, border, flip)
 	love.graphics.setLine(1, 'rough')
