@@ -31,8 +31,8 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 function car:getCollisionLines() 
 	local lines = {}
 	
-	local headingSize = 45
-	local headingAngle = 3.14159 / 36 * 2 -- 10°
+	local headingSize = 38
+	local headingAngle = 3.14159 / 36 * 1 -- 10°
 
 	local headingLeft = self.pos + headingSize * vector (math.cos(self.angle - headingAngle), math.sin(self.angle - headingAngle))
 	local headingRight = self.pos + headingSize * vector (math.cos(self.angle + headingAngle), math.sin(self.angle + headingAngle))
@@ -83,12 +83,17 @@ function car:updateStateMachine()
 			self:setState('pause')
 		end
 	elseif self.state == 'pause' then
+		local now = love.timer.getMicroTime()
 		if #self.hitList == 0 then
 			self:setState('drive')
-		else 
-			self:setState('reverse')
+		elseif now - self.lastStateUpdate > 3 then 
+			if math.random(0, 2) < 1 then
+				self:setState('reverseLeft')
+			else 
+				self:setState('reverseRight')
+			end
 		end
-	elseif self.state == 'reverse' then
+	elseif self.state == 'reverseLeft' or self.state == 'reverseRight' then
 		local now = love.timer.getMicroTime()
 		if #self.hitList == 0 and now - self.lastStateUpdate > 3 then
 			self:setState('pause')
@@ -115,16 +120,19 @@ function car:updatePosition(dt, angle)
 	end
 	--self:log("self:angle="..self.angle.." angle="..angle)
 	
+	self.velocity = vector(0, 0)
+
 	if self.state == 'drive' then
 		self.velocity = heading * self.speed
-		self.pos = self.pos + dt * self.velocity
 		self.angle_velocity = 0.2 * angleD / dt
 	elseif self.state == 'pause' then
-		self.velocity = self.velocity * 0.7
-	elseif self.state == 'reverse' then
-		self.velocity = heading * self.speed * 0.4
-		self.pos = self.pos - dt * self.velocity
-		self.angle_velocity = 0.2
+		self.velocity = vector(0, 0)
+	elseif self.state == 'reverseLeft' then
+		self.velocity = heading * self.speed * -0.5
+		self.angle_velocity = math.pi 
+	elseif self.state == 'reverseRight' then
+		self.velocity = heading * self.speed * -0.5
+		self.angle_velocity = - math.pi
 	end
 end
 
@@ -197,11 +205,11 @@ function car:findNextTarget(map, pos, v)
 	local rV = v:rotated(math.pi / 2)
 
 	local ahead = pos + v
-	local ahead4 = pos + 5 * v
+	local ahead4 = pos + 3 * v
 	local right = pos + rV
-	local right4 = pos + 5 * rV
+	local right4 = pos + 3 * rV
 	local left = pos + lV
-	local left4 = pos + 5 * lV
+	local left4 = pos + 3 * lV
 
 	local changes = {}
 	if map:isStreet(ahead.x, ahead.y) and map:isStreet(ahead4.x, ahead4.y) then
@@ -282,6 +290,8 @@ function car:update(dt)
 	local angle = self:getAngle(self.pos, self.targetPos)
 	--self:log("Target position is " .. self.targetPos.x .. ", " .. self.targetPos.y .. " with angle " .. angle)
 	self:updatePosition(dt, angle)
+
+	self:log("velocity: " .. tostring(self.velocity))
 
 	self:updateToPhysics()
 end

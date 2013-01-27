@@ -79,10 +79,11 @@ function st:enter()
 	-- pedestrians
 	self.flock = Entity.flock(50)
 
-	for i = 1,80 do
+	for i = 1,40 do
 		local pos = vector(math.random(0,160 * 32), math.random(0,160 * 32))
 		pos = self:getStreetPos()
-		local car = Entity.car (vector(map.rescue_zone.x + i * 100, map.rescue_zone.y + 30), 0, "Car " .. i)
+		--local car = Entity.car (vector(map.rescue_zone.x + i * 100, map.rescue_zone.y + 30), 0, "Car " .. i)
+		--car.state = 'reverseLeft'
 		--car.direction = 'east'
 		--car.angle = math.pi - math.random(0,1) + 0.5
 		local car = Entity.car (pos, 0, "Car " .. i)
