@@ -132,7 +132,7 @@ function pedestrian:detectCollision(hitList)
 end
 
 function pedestrian:update(dt)
-	self.flock:maybeRelocate(self)
+	self.flock:maybeRelocate(self, false)
 
 	-- behavior
 	self:updateFromPhysics()
