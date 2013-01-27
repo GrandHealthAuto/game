@@ -2,10 +2,10 @@ local monitor = class{name = 'Heartmonitor',
 	function (self)
 		self.t = 0
 		self.scale = 2
-		self.ox = Image.heart:getWidth()/2
-		self.oy = Image.heart:getHeight()/2
+		self.w = Image.heart:getWidth()
+		self.h = Image.heart:getHeight()
 		self.x = SCREEN_WIDTH/2
-		self.y = self.oy+20
+		self.y = self.h/2+20
 
 		self.arrow = {Image.questmarker_arrow_full, Image.questmarker_arrow_empty}
 		self.heart = {Image.questmarker_heart_full, Image.questmarker_heart_empty}
@@ -14,13 +14,17 @@ local monitor = class{name = 'Heartmonitor',
 
 function monitor:draw()
 	local victim = State.game.current_target or State.game.current_passanger
-	local h = {Image.heart, Image.heart_gray}
-	local p = math.min(1, victim.heartrate / 100)
-	love.graphics.setColor(255,255,255,(1-p)*255)
-	love.graphics.draw(h[2], self.x,self.y, 0, self.scale, self.scale, self.ox, self.oy)
-	love.graphics.setColor(255,255,255,p*255)
-	love.graphics.draw(h[1], self.x,self.y, 0, self.scale, self.scale, self.ox, self.oy)
-	love.graphics.setColor(255,255,255)
+	local w, h = math.floor(self.w * self.scale), math.floor(self.h * self.scale)
+	local x, y = math.floor(self.x-w/2), math.floor(self.y-h/2)
+	local p = 1 - math.min(1, victim.heartrate / 150)
+
+	love.graphics.setScissor(x,y, w, p*h)
+	love.graphics.draw(Image.heart_gray, self.x,self.y, 0, self.scale, self.scale, self.w/2, self.h/2)
+
+	love.graphics.setScissor(x,y+p*h, w,(1-p)*h)
+	love.graphics.draw(Image.heart, self.x,self.y, 0, self.scale, self.scale, self.w/2, self.h/2)
+
+	love.graphics.setScissor()
 end
 
 function monitor:drawMarker()
