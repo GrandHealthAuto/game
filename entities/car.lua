@@ -324,6 +324,7 @@ function car:findNextTarget(map, pos, v)
 		table.insert(changes, {name = 'left', target = target, direction = self:getLeftDirection(self.direction)})
 	end
 	if #changes == 0 then
+		self.speedMultiplier = math.floor(self.speedMultiplier * 0.6)
 		return self:searchStreet(map, pos, v)
 	end
 	local i = math.floor(math.random(0, #changes - 1)) + 1
@@ -331,6 +332,7 @@ function car:findNextTarget(map, pos, v)
 	if changes[i].direction ~= self.direction then
 		self:log("Change direction from " .. self.direction .. " to " .. changes[i].direction)
 		self.direction = changes[i].direction
+		self.speedMultiplier = math.floor(self.speedMultiplier * 0.6)
 	end
 	return map:mapCoordsCenter(changes[i].target.x, changes[i].target.y)
 end
