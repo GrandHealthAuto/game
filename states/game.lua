@@ -54,6 +54,31 @@ function st:init()
 	self.map = map
 end
 
+function st:spawn_target()
+	-- rotated bounding box
+	local xul,yul = self.cam:worldCoords(-SCREEN_WIDTH,-SCREEN_HEIGHT)
+	local xll,yll = self.cam:worldCoords(-SCREEN_WIDTH, SCREEN_HEIGHT)
+	local xur,yur = self.cam:worldCoords( SCREEN_WIDTH,-SCREEN_HEIGHT)
+	local xlr,ylr = self.cam:worldCoords( SCREEN_WIDTH, SCREEN_HEIGHT)
+
+	-- axis aligned bounding box
+	local x0,y0 = math.min(xul, xll, xur, xlr), math.min(yul, yll, yur, ylr)
+	local x1,y1 = math.max(xul, xll, xur, xlr), math.max(yul, yll, yur, ylr)
+
+	x0,y0 = x0/32, y0/32
+	x1,y1 = x1/32, y1/32
+
+	local p = vector(0,0)
+	repeat
+		p.x = math.random(3, self.map.width - 3)
+		p.y = math.random(3, self.map.height - 3)
+	until self.map:cell(p.x,p.y).is_walkable and (p.x < x0 or p.x > x1) and (p.y < y0 or p.y > y1)
+
+	local v = Entity.victim(p*32-vector(16,16))
+	self.victims[v] = v
+	Signal.emit('get-next-victim')
+end
+
 function st:enter()
 	self:resetWorld()
 
@@ -106,9 +131,7 @@ function st:enter()
 	Signal.register('get-next-victim', function()
 		local target = next(self.victims)
 		if not target then
-			st:showHighscore()
-			Signal.emit('game-over', 'no more victims')
-			return
+			return self:spawn_target()
 		end
 		self.current_target = target
 		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
@@ -118,8 +141,8 @@ function st:enter()
 
 	Signal.register('game-over', function()
 		print "game over"
-		--hs:save()
-		--st:showHighscore()
+		hs:save()
+		st:showHighscore()
 	end)
 	
 	-- pedestrians
@@ -134,10 +157,7 @@ function st:enter()
 
 	Entities.registerPhysics(self.world)
 
-	-- XXX: properly initialize this
-	local v = Entity.victim(map.rescue_zone + vector(500,0))
-	self.victims[v] = v
-	Signal.emit('get-next-victim')
+	self:spawn_target()
 
 	self.heart_monitor = Entity.heartmonitor()
 	self.radio = Entity.radio()
