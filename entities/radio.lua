@@ -1,19 +1,19 @@
 local radio = class{name = 'Radio',
     function(self)
-        self.volume = 0.5
+        self.volume = 0.8
         self.sender = {
-            { name = 'Riddim Radio 104.9', snd = Sound.static.reggae},
-            { name = '', snd = Sound.static.reggae }
+            { name = 'Cardiac Riddim Radio 104.9', snd = Sound.stream.reggae},
+            { name = 'Up The Antechamber 76.2', snd = Sound.stream.drone }
         }
-        self.id = 1
-        self:play(1)
+        self.id = math.random(#self.sender)
+        self:play(self.id)
     end
 }
 
 function radio:play(id)
     self.music = self.sender[self.id].snd:play()
     self.music:setVolume(self.volume)
-    self.music:setLooping()
+    self.music:setLooping(true)
 end
 
 function radio:draw()
