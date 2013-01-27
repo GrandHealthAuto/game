@@ -3,7 +3,10 @@ local radio = class{name = 'Radio',
         self.volume = 0.8
         self.sender = {
             { name = 'Cardiac Riddim Radio 104.9', snd = Sound.stream.reggae},
-            { name = 'Up The Antechamber 76.2', snd = Sound.stream.drone }
+            { name = 'Up The Antechamber 76.2', snd = Sound.stream.drone },
+            { name = 'Electronic Pacemaker 55.6', snd = Sound.stream.electro},
+            { name = 'Hop Hop 55.6', snd = Sound.stream.hiphop},
+            { name = 'Psychedelic Veins 55.6', snd = Sound.stream.psy}
         }
         self.id = math.random(#self.sender)
         self:play(self.id)
