@@ -100,7 +100,7 @@ function st:init()
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
 		-- hs:add(-100)
-		Sound.static["shout"..math.random(7)]:play()
+		Sound.static["shout"..math.random(7)]:play():setVolume(0.5)
 		local v = Entity.victim(pedestrian.pos)
 		v.color = pedestrian.color
 		self.victims[v] = v
