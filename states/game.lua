@@ -113,6 +113,13 @@ function st:enter()
 		self.pickup_progress = 0
 	end)
 
+	Signal.register('game-over', function()
+		print "game over"
+		local ht = require "highscoretable"
+		hs:save()
+		ht(hs:getHighscore(0))
+	end)
+	
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
 		-- hs:add(-100)
@@ -177,7 +184,6 @@ function st:mappingDown(mapping)
 end
 
 function st:leave()
-	hs:save()
 	Signal.clear()
 	Entities.clear()
 	self.player = nil

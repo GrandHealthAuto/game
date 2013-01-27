@@ -5,7 +5,8 @@ local hs = highscorefetcher.new()
 local offset =0
 local st = GS.new()
 local mouse_hot, mouse_x, mouse_y
-local hsData = nil
+hsData = nil
+local ht = require "highscoretable"
 
 function st:enter()
 	offset = 0
@@ -38,8 +39,20 @@ function st:update(dt)
 		
 		Gui.group.pop()
 		
-		drawHighscore(hsData)
-		
+		Gui.group.push{ grow="right", size={ 300, 30}, pos={10,10} }
+			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
+		Gui.group.pop{}
+				
+		if hsData then
+			for i, player in pairs(hsData) do
+				Gui.group.push{ grow="right", size={ 300, 30}, pos={10,0} }
+					Gui.Label{text=player["rank"], size={100, 30}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
+				Gui.group.pop{}
+			end
+		else
+			Gui.Label{text="The highscore server is currently not reachable"}
+		end
+
 		if Gui.Button{text="Back"} then
 			GS.transition(.5, State.menu)
 		end
@@ -75,20 +88,5 @@ function st:mappingDown(mapping)
 	-- FIXME: play sound
 end
 
-function drawHighscore(hsd)
-		Gui.group.push{ grow="right", size={ 300, 30}, pos={10,10} }
-			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
-		Gui.group.pop{}
-				
-		if hsd then
-			for i, player in pairs(hsData) do
-				Gui.group.push{ grow="right", size={ 300, 30}, pos={10,0} }
-					Gui.Label{text=player["rank"], size={100, 30}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
-				Gui.group.pop{}
-			end
-		else
-			Gui.Label{text="The highscore server is currently not reachable"}
-		end
-end
 
 return st
