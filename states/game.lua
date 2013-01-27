@@ -60,8 +60,10 @@ function st:registerSignals()
 	end)
 
 	Signal.register('victim-delivered', function()
+		local points = 100 + (math.floor(self.current_passanger.heartrate / 10) * 10)
+		print (points)
+		hs:add(points)
 		self.current_passanger = false
-		hs:add(100)
 		Signal.emit('get-next-victim')
 	end)
 
@@ -201,6 +203,7 @@ function st:enter()
 	self.player = Entity.player(map.rescue_zone)
 
 	self.notification = Entity.notification ("undefined")
+	self.popup = Entity.notification ("undefined")
 
 	-- pedestrians and cars
 	self.flock = Entity.flock(50, 10)
