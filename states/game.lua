@@ -3,6 +3,7 @@ local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
 st.world = {}
+st.camMargin = 200
 
 function st:resetWorld()
 	st.world = love.physics.newWorld()
@@ -295,7 +296,7 @@ function st:update(dt)
 	if math.abs(self.cam.direction.y) > SCREEN_HEIGHT/3 then
 		delta.y = self.cam.direction.y
 	end
-	self.cam.pos = self.cam.pos + delta
+	self.cam.pos = self.map:adjustInboundPos(self.cam.pos + delta, self.camMargin)
 	self.cam:lookAt(math.floor(self.cam.pos.x+.5), math.floor(self.cam.pos.y+.5))
 
 	self.world:update(dt)
