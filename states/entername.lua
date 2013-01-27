@@ -33,8 +33,14 @@ function st:update(dt)
 			if Gui.Button{text="Start"} then
 				GVAR['player_name'] = inputInfo["text"]
 				GS.transition(.5, State.game)
-				State.menu.music:stop()
-				State.menu.music = false
+				local amp = 1
+				Timer.do_for(1, function(dt)
+					amp = amp - dt
+					State.menu.music:setVolume(math.max(0, amp))
+				end, function()
+					State.menu.music:stop()
+					State.menu.music = false
+				end)
 			end
 		end
 		Gui.group.pop{}
@@ -50,6 +56,17 @@ function st:draw()
 end
 
 function st:mappingDown(mapping)
+	local cycle
+	if mapping == 'up' then
+		Gui.keyboard.pressed('select-prev')
+	elseif mapping == 'down' then
+		Gui.keyboard.pressed('select-next')
+	elseif mapping == 'action' then
+		Gui.keyboard.pressed('return')
+	else
+		return
+	end
+
 	-- sync keyboard and mouse highlight
 	Gui.mouse.setHot(Gui.keyboard.getFocus())
 	mouse_hot = Gui.mouse.getHot()

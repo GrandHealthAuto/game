@@ -16,4 +16,22 @@ function st:draw()
 	Gui.core.draw()
 end
 
+function st:mappingDown(mapping)
+	local cycle
+	if mapping == 'up' then
+		Gui.keyboard.pressed('select-prev')
+	elseif mapping == 'down' then
+		Gui.keyboard.pressed('select-next')
+	elseif mapping == 'action' then
+		Gui.keyboard.pressed('return')
+	else
+		return
+	end
+
+	-- sync keyboard and mouse highlight
+	Gui.mouse.setHot(Gui.keyboard.getFocus())
+	mouse_hot = Gui.mouse.getHot()
+	-- FIXME: play sound
+end
+
 return st
