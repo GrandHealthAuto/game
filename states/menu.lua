@@ -30,14 +30,17 @@ function st:enter()
 	end
 end
 
+function st:leave()
+	Gui.keyboard.pressed()
+	Gui.keyboard.setFocus(nil)
+end
+
 local t = 0
 function st:update(dt)
 	t = t + dt
 	love.graphics.setFont(Font.XPDR[16])
 	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .6}}
 	if Gui.Button{text="START"} then
-		self.music:stop()
-		self.music = false
 		GS.switch(State.entername)
 	end
 	if Gui.Button{text="HIGHSCORES"} then
