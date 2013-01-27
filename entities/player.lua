@@ -2,10 +2,12 @@ local player = class{name = "Player", inherits = Entity.BaseEntity,
 	function (self, pos)
 		Entity.BaseEntity.construct (self, pos, vector(56, 24))
 		self.visual = Image.ambulancebig
-		self.mass = 5
+		self.mass = 8
 		self.linear_damping = GVAR.player_linear_damping
 		self.angular_damping = GVAR.player_angular_damping
 		self.shape_offset = vector(14,0)
+		self.gui_speed = 0
+		self.gui_speed_next_update = -1
 
 		self.physics.shape = love.physics.newPolygonShape(
 			-28 + 14,  7,
@@ -129,6 +131,12 @@ function player:update(dt)
 	local tangential_part = self.heading * self.velocity
 	local velocity_ortho = self.velocity - (self.heading * tangential_part)
 	self.skidfactor = math.max (velocity_ortho:len() - GVAR["player_ortho_vel_skid_start"], 0);
+	
+	self.gui_speed_next_update = self.gui_speed_next_update - dt
+	if self.gui_speed_next_update < 0 then
+		self.gui_speed = (math.floor(self.velocity:len() / 2.9 ) / 10 ) * 10 
+		self.gui_speed_next_update = 0.05
+	end
 
 	self:updateToPhysics()
 end

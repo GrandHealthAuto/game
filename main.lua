@@ -22,7 +22,7 @@ GVAR = {
 	player_accel_max_speed = 20 * 32, -- m/s
 	player_motor_sound_maxspeed = 20 * 32,
 	player_reverse = -20. * 32, -- m/s^2
-	player_reverse_max_speed = 15. * 32, -- m/s
+	player_reverse_max_speed = 20. * 32, -- m/s
 	player_rotation_speed = 220 * math.pi / 180.,
 	player_ortho_vel_skid_start = 150,
 
