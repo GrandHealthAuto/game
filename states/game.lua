@@ -53,57 +53,6 @@ local map, geometry
 function st:init()
 	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	self.map = map
-end
-
-function st:spawn_target()
-	-- rotated bounding box
-	local xul,yul = self.cam:worldCoords(-SCREEN_WIDTH,-SCREEN_HEIGHT)
-	local xll,yll = self.cam:worldCoords(-SCREEN_WIDTH, SCREEN_HEIGHT)
-	local xur,yur = self.cam:worldCoords( SCREEN_WIDTH,-SCREEN_HEIGHT)
-	local xlr,ylr = self.cam:worldCoords( SCREEN_WIDTH, SCREEN_HEIGHT)
-
-	-- axis aligned bounding box
-	local x0,y0 = math.min(xul, xll, xur, xlr), math.min(yul, yll, yur, ylr)
-	local x1,y1 = math.max(xul, xll, xur, xlr), math.max(yul, yll, yur, ylr)
-
-	x0,y0 = x0/32, y0/32
-	x1,y1 = x1/32, y1/32
-
-	local p = vector(0,0)
-	repeat
-		p.x = math.random(3, self.map.width - 3)
-		p.y = math.random(3, self.map.height - 3)
-	until self.map:cell(p.x,p.y).is_walkable and (p.x < x0 or p.x > x1) and (p.y < y0 or p.y > y1)
-
-	local v = Entity.victim(p*32-vector(16,16))
-	self.victims[v] = v
-	Signal.emit('get-next-victim')
-end
-
-function st:enter()
-	self:resetWorld()
-
-	self.cam = Camera()
-	self.cam.scale = 2
-	self.cam.pos = vector(self.cam.x, self.cam.y)
-
-	self.player = Entity.player(map.rescue_zone)
-
-	self.notification = Entity.notification ("undefined")
-
-	-- pedestrians and cars
-	self.flock = Entity.flock(50, 10)
-
-	for rect in pairs(geometry) do
-		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
-	end
-
-	self.marker = Entity.questmarker(map.rescue_zone)
-
-	self.victims = {}
-	self.current_target    = false
-	self.current_passanger = false
-	self.pickup_progress   = 0
 
 	Signal.register('quest-timer', function(p)
 		self.pickup_progress = p
@@ -181,16 +130,70 @@ function st:enter()
 		Input.mappingDown = function(mapping, mag)
 			if mapping == 'escape' then
 				love.audio.stop()
+				continue()
+				Input.mappingDown = mappingDown
 				GS.switch(State.menu)
-				continue()
-				Input.mappingDown = mappingDown
 			elseif mapping == 'action' then
-				GS.switch(State.game)
 				continue()
 				Input.mappingDown = mappingDown
+				GS.switch(State.game)
 			end
 		end
 	end)
+end
+
+function st:spawn_target()
+	print ("spawned target")
+
+	-- rotated bounding box
+	local xul,yul = self.cam:worldCoords(-SCREEN_WIDTH,-SCREEN_HEIGHT)
+	local xll,yll = self.cam:worldCoords(-SCREEN_WIDTH, SCREEN_HEIGHT)
+	local xur,yur = self.cam:worldCoords( SCREEN_WIDTH,-SCREEN_HEIGHT)
+	local xlr,ylr = self.cam:worldCoords( SCREEN_WIDTH, SCREEN_HEIGHT)
+
+	-- axis aligned bounding box
+	local x0,y0 = math.min(xul, xll, xur, xlr), math.min(yul, yll, yur, ylr)
+	local x1,y1 = math.max(xul, xll, xur, xlr), math.max(yul, yll, yur, ylr)
+
+	x0,y0 = x0/32, y0/32
+	x1,y1 = x1/32, y1/32
+
+	local p = vector(0,0)
+	repeat
+		p.x = math.random(3, self.map.width - 3)
+		p.y = math.random(3, self.map.height - 3)
+	until self.map:cell(p.x,p.y).is_walkable and (p.x < x0 or p.x > x1) and (p.y < y0 or p.y > y1)
+
+	local v = Entity.victim(p*32-vector(16,16))
+	self.victims[v] = v
+	self.current_target = v
+	Signal.emit('get-next-victim')
+end
+
+function st:enter()
+	self:resetWorld()
+
+	self.cam = Camera()
+	self.cam.scale = 2
+	self.cam.pos = vector(self.cam.x, self.cam.y)
+
+	self.player = Entity.player(map.rescue_zone)
+
+	self.notification = Entity.notification ("undefined")
+
+	-- pedestrians and cars
+	self.flock = Entity.flock(50, 10)
+
+	for rect in pairs(geometry) do
+		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
+	end
+
+	self.marker = Entity.questmarker(map.rescue_zone)
+
+	self.victims = {}
+	self.current_target    = false
+	self.current_passanger = false
+	self.pickup_progress   = 0
 
 	Entities.registerPhysics(self.world)
 
@@ -247,7 +250,7 @@ end
 
 function st:leave()
 	hs:save()
-	Signal.clear()
+	Signal.clear_pattern(".*")
 	Entities.clear()
 	self.player = nil
 end
