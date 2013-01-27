@@ -26,7 +26,13 @@ function st:enter()
 
 	if not self.music then
 		self.music = Sound.stream.menu:play()
+		self.music:seek(math.random()*90)
 		self.music:setLooping(true)
+		local amp = 0
+		Timer.do_for(2, function(dt)
+			amp = amp + dt / 2
+			self.music:setVolume(amp)
+		end, function() self.music:setVolume(1) end)
 	end
 end
 
