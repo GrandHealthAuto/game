@@ -5,8 +5,7 @@ local hs = highscorefetcher.new()
 local offset =0
 local st = GS.new()
 local mouse_hot, mouse_x, mouse_y
-hsData = nil
-local ht = require "highscoretable"
+local hsData = nil
 
 function st:enter()
 	offset = 0
