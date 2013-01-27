@@ -27,6 +27,12 @@ function Highscore:save()
 	return false
 end
 
+function Highscore:getSavedHighscore()
+	b,c,h = http.request(self.server .."get/", "name=" .. self.name
+	if not c == 200 then return false end
+	return b
+end
+
 --- returns table, containing tables with keys name/value/rank 
 function Highscore:getHighscore(offset)
 	b,c,h = http.request(self.server .. "load/", "offset=" .. offset)
