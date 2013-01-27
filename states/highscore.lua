@@ -14,59 +14,49 @@ function st:enter()
 end
 
 function st:update(dt)
-    Gui.group.push{
-		grow = "down", 
-		pos={
-			SCREEN_WIDTH/2-Gui.group.default.size[1]/2,
-			0
-		},
-	}
-	
-		Gui.group.push{ grow="right", size={ 400, 20}}
-		
-			if Gui.Button{text="Previous Page"} then
-				offset = offset - 25
-				if offset < 0 then offset = 0 end
-				hsData = hs:getHighscore(offset)
-			end
-			
-			
-			if Gui.Button{text="Next Page"} then
-				offset = offset + 25
-				hsData = hs:getHighscore(offset)
-			end
-		
-		Gui.group.pop()
-		
-		Gui.group.push{ grow="right", size={ 300, 30}, pos={30,5} }
-			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
-		Gui.group.pop{}
-				
+	local w = (SCREEN_WIDTH-50)/2
+	love.graphics.setFont(Font.XPDR[24])
+	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .51}, function()
 		if hsData then
-			for i, player in pairs(hsData) do
-				Gui.group.push{ grow="right", size={ 300, 20}, pos={30,0} }
-					Gui.Label{text=player["rank"], size={100, 20}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
+			for i = 1,math.min(#hsData, 7) do
+				local player = hsData[i]
+				Gui.group.push{grow="right", size={w, 30}}
+					Gui.Label{text=player["name"],  align = "right", size = {w-10}}
+					Gui.Label{text=player["value"], align="left", pos = {10}}
 				Gui.group.pop{}
 			end
 		else
 			Gui.Label{text="The highscore server is currently not reachable"}
 		end
+	end}
 
+	love.graphics.setFont(Font.XPDR[16])
+	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT - 90}, function()
+		Gui.group{grow="right", size={w}, function()
+			if Gui.Button{text="Previous Page"} then
+				offset = offset - 7
+				if offset < 0 then offset = 0 end
+				hsData = hs:getHighscore(offset)
+			end
+			if Gui.Button{text="Next Page"} then
+				offset = offset + 7
+				hsData = hs:getHighscore(offset)
+			end
+		end}
 		if Gui.Button{text="Back"} then
 			GS.transition(.5, State.menu)
 		end
-		
-		-- on mouse move -> set widget focus to mouse
-		if mouse_hot ~= Gui.mouse.getHot() then
-			Gui.keyboard.setFocus(Gui.mouse.getHot() or Gui.keyboard.getFocus())
-			mouse_hot = Gui.mouse.getHot()
-		end
-	
-	Gui.group.pop{}
+	end}
+
+	-- on mouse move -> set widget focus to mouse
+	if mouse_hot ~= Gui.mouse.getHot() then
+		Gui.keyboard.setFocus(Gui.mouse.getHot() or Gui.keyboard.getFocus())
+		mouse_hot = Gui.mouse.getHot()
+	end
 end
 
 function st:draw()
-    Gui.core.draw()
+    State.menu.draw(self)
 end
 
 function st:mappingDown(mapping)
@@ -86,6 +76,5 @@ function st:mappingDown(mapping)
 	mouse_hot = Gui.mouse.getHot()
 	-- FIXME: play sound
 end
-
 
 return st
