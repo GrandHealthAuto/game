@@ -3,7 +3,7 @@ local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
 st.world = {}
-st.camMargin = 200
+st.camMargin = 100
 
 function st:resetWorld()
 	st.world = love.physics.newWorld()
