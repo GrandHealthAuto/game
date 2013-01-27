@@ -54,27 +54,41 @@ function st:init()
 	self.map = map
 end
 
+function st:getStreetPos()
+	local w = map.width
+	local h = map.height
+	for i = 0, 100 do
+		local x = math.floor(math.random(0, w))
+		local y = math.floor(math.random(0, h))
+		if map:isStreet(x, y) then
+			return map:mapCoordsCenter(x, y)
+		end
+	end
+	return map:mapCoordsCenter(math.floor(math.random(0, w)), math.floor(math.random(0, h)))
+end
+
 function st:enter()
 	self:resetWorld()
 
+	self.cam = Camera()
+	self.cam.scale = 2
+	self.cam.pos = vector(self.cam.x, self.cam.y)
+
 	self.player = Entity.player(map.rescue_zone)
 
-	self.pedestrians = {}
-	for i = 1,300 do
+	-- pedestrians
+	self.flock = Entity.flock(50)
+
+	for i = 1,80 do
 		local pos = vector(math.random(0,160 * 32), math.random(0,160 * 32))
-		local pedestrian = Entity.pedestrian (pos, math.random(0,3.1415), "Person " .. i)
-		table.insert(self.pedestrians, pedestrian)
-	end
-
-	for i = 1,50 do
-		local pos = vector(math.random(0,SCREEN_WIDTH), math.random(0,SCREEN_HEIGHT))
-		-- local car = Entity.car (pos, 0, "Car ")
+		pos = self:getStreetPos()
+		local car = Entity.car (vector(map.rescue_zone.x + i * 100, map.rescue_zone.y + 30), 0, "Car " .. i)
+		--car.direction = 'east'
+		--car.angle = math.pi - math.random(0,1) + 0.5
 		local car = Entity.car (pos, 0, "Car " .. i)
+		--car:log(car.pos.x .. "," .. car.pos.y .. " " .. car.targetPos.x .. "," .. car.targetPos.y)
 	end
 
-	cam = Camera()
-	cam.scale = 2
-	cam.pos = vector(cam.x, cam.y)
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
 	end
@@ -127,6 +141,7 @@ function st:enter()
 		hs:add(-100)
 		Sound.static["shout"..math.random(2)]:play()
 		local v = Entity.victim(pedestrian.pos)
+		v.color = pedestrian.color
 		self.victims[v] = v
 		Entities.remove(pedestrian)
 	end)
@@ -139,6 +154,21 @@ function st:enter()
 	Signal.emit('get-next-victim')
 
 	self.heart_monitor = Entity.heartmonitor()
+	self.radio = Entity.radio()
+	st.sirensfx = false
+end
+
+function st:mappingDown(mapping)
+	if mapping == 'action' then
+	    if not st.sirensfx then
+            Sound.static.siren:setVolume(0.2)
+            Sound.static.siren:setLooping(true)
+            st.sirensfx = Sound.static.siren:play() 
+        else
+            st.sirensfx:stop()
+            st.sirensfx = false
+        end
+    end
 end
 
 function st:leave()
@@ -150,8 +180,8 @@ end
 
 function st:draw()
 	love.graphics.setColor(255,255,255)
-	cam:attach()
-	map:draw(cam)
+	self.cam:attach()
+	map:draw(self.cam)
 	Entities.draw()
 
 	if self.player then
@@ -159,10 +189,11 @@ function st:draw()
 	end
 
 	self.heart_monitor:drawMarker()
-	cam:detach()
+	self.cam:detach()
 
 	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
 	self.heart_monitor:draw()
+	self.radio:draw()
 end
 
 function st:update(dt)
@@ -170,26 +201,26 @@ function st:update(dt)
 	local lookahead = self.player.velocity * 40 * dt
 	lookahead.x = math.max(math.min(lookahead.x, 200), -200)
 	lookahead.y = math.max(math.min(lookahead.y, 200), -200)
-	cam.target = self.player.pos + lookahead
+	self.cam.target = self.player.pos + lookahead
 	if self.player.heading then
-		cam.rot_target = self.player.heading:cross(self.player.velocity:normalized()) * .03
-		cam.rot_target = math.min(math.max(cam.rot_target, -math.pi/20), math.pi/20)
-		cam.rot = cam.rot + (cam.rot_target - cam.rot) * 5 * dt
+		self.cam.rot_target = self.player.heading:cross(self.player.velocity:normalized()) * .03
+		self.cam.rot_target = math.min(math.max(self.cam.rot_target, -math.pi/20), math.pi/20)
+		self.cam.rot = self.cam.rot + (self.cam.rot_target - self.cam.rot) * 5 * dt
 	end
 
 	-- awesome camera zooming
 	--cam:zoomTo(2. -  self.player.velocity:len() * 0.001)
 
-	cam.direction = cam.target - cam.pos
-	local delta = cam.direction * dt * 4
-	if math.abs(cam.direction.x) > SCREEN_WIDTH/3 then
-		delta.x = cam.direction.x
+	self.cam.direction = self.cam.target - self.cam.pos
+	local delta = self.cam.direction * dt * 4
+	if math.abs(self.cam.direction.x) > SCREEN_WIDTH/3 then
+		delta.x = self.cam.direction.x
 	end
-	if math.abs(cam.direction.y) > SCREEN_HEIGHT/3 then
-		delta.y = cam.direction.y
+	if math.abs(self.cam.direction.y) > SCREEN_HEIGHT/3 then
+		delta.y = self.cam.direction.y
 	end
-	cam.pos = cam.pos + delta
-	cam:lookAt(math.floor(cam.pos.x+.5), math.floor(cam.pos.y+.5))
+	self.cam.pos = self.cam.pos + delta
+	self.cam:lookAt(math.floor(self.cam.pos.x+.5), math.floor(self.cam.pos.y+.5))
 
 	self.world:update(dt)
 

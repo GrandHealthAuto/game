@@ -5,6 +5,7 @@ local victim = class{name = 'Victim',
 		self.oy = img:getHeight()/2
 		self.pos = pos:clone()
 		self.rot = math.random(0,2*math.pi)
+		self.color = {255, 255, 255, 255}
 
 		self.heartrate = 100
 
@@ -15,7 +16,12 @@ local victim = class{name = 'Victim',
 
 function victim:draw()
 	if not self.is_stabilized then
-		love.graphics.draw(Image.pedestriandead, self.pos.x, self.pos.y, self.rot, 1,1, self.ox, self.oy)
+		love.graphics.draw(Image.pedestriandead_blood, self.pos.x, self.pos.y, self.rot, 1,1, self.ox, self.oy)
+
+		old_color = {love.graphics.getColor() }
+		love.graphics.setColor (self.color)
+		love.graphics.draw(Image.pedestriandead_body, self.pos.x, self.pos.y, self.rot, 1,1, self.ox, self.oy)
+		love.graphics.setColor(old_color)
 	end
 end
 
