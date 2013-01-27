@@ -8,7 +8,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.targetPos = pos
 		self.speed = 40
 		self.speedMultiplier = 1
-		self.speedReverse = 130
+		self.speedReverse = 100
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
@@ -62,7 +62,7 @@ end
 
 -- detect any collision
 function car:detectCollision()
-	if self.state == 'reverse' then
+	if self.state == 'reverseLeft' or self.state == 'reverseRight' then
 		return
 	end
 
@@ -106,7 +106,7 @@ function car:updateStateMachine()
 		end
 	elseif self.state == 'reverseLeft' or self.state == 'reverseRight' then
 		local now = love.timer.getMicroTime()
-		if #self.hitList == 0 and now - self.lastStateUpdate > 2 then
+		if #self.hitList == 0 and now - self.lastStateUpdate > 1.5 then
 			self:setState('pause')
 		end
 	end
