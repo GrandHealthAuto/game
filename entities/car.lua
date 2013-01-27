@@ -12,7 +12,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
-		self.color = { math.random() * 255, math.random() * 255, math.random() * 255, 255 }
+		self.color = { math.random() * 128 + 128, math.random() * 64 + 192, math.random() * 64 + 192, 255 }
 
 		self.physics.shape = love.physics.newPolygonShape(
 			-24 + 10,  8,
