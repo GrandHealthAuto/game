@@ -274,7 +274,12 @@ end
 
 function showHighscore()
 	local height = SCREEN_HEIGHT/4-Font[30]:getLineHeight();
-	love.graphics.printf("HIGHSCORE", 0,,SCREEN_WIDTH, 'center')
+	love.graphics.printf("HIGHSCORE", 0,height, SCREEN_WIDTH, 'center')
+	hsData = hs:getHighscore(0)
+	for i, player in pairs(hsData) do
+		height += Font[30]:getLineHeight()
+		love.graphics.printf(player["value"] .. ") " .. player["name"] .. " (" .. player["rank"] .. ".)", 0,height, SCREEN_WIDTH, 'center')
+	end
 end 
 
 return st
