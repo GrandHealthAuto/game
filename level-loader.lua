@@ -73,11 +73,15 @@ return function(map_path, tile_info, tile_data)
 		for x = 0,image_data:getWidth()-1 do
 			local hex = ("%02x%02x%02x%02x"):format(image_data:getPixel(x,y))
 			local tile = tile_info[color_to_tile[hex]] or {}
-			if tile.name then
+			local name = tile.name
+			if name then
+				if name == 'hochhaus' then
+					name = name .. math.random(1,70)
+				end
 				row[x+1] = {
-					q = quads[tile.name],
-					is_street   = tile.name:match('street$'),
-					is_sidewalk = tile.name:match('sidewalk$'),
+					q = quads[name],
+					is_street   = name:match('street$'),
+					is_sidewalk = name:match('sidewalk$'),
 					is_walkable = not tile.is_collision_tile,
 				}
 			end

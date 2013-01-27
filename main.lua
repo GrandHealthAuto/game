@@ -22,7 +22,7 @@ GVAR = {
 	player_accel_max_speed = 20 * 32, -- m/s
 	player_motor_sound_maxspeed = 20 * 32,
 	player_reverse = -20. * 32, -- m/s^2
-	player_reverse_max_speed = 15. * 32, -- m/s
+	player_reverse_max_speed = 20. * 32, -- m/s
 	player_rotation_speed = 220 * math.pi / 180.,
 	player_ortho_vel_skid_start = 150,
 
@@ -35,18 +35,21 @@ GVAR = {
 }
 
 function serialize(t, indent)
+	local result = ""
 	indent = "  " or indent
 	for k,v in pairs(t) do
 		if type(v) == "table" then
-			print (indent .. " " .. k .. " = table (" .. tostring(v) .. "):")
-			serialize (v, indent .. "  ")
+			result = result .. (indent .. " " .. k .. " = table (" .. tostring(v) .. "):") .. "\n"
+			result = result .. serialize (v, indent .. "  ") .. "\n"
 		else
-			print (indent .. " " .. k .. " = " .. tostring(v))
+			result = result .. (indent .. " " .. k .. " = " .. tostring(v)) .. "\n"
 		end
 	end
+
+	return result
 end
 
-function GS.transition(to, length, ...)
+function GS.transition(length, to, ...)
 	length = length or 1
 
 	local fade_color, sw, t = {0,0,0,0}, GS.switch, 0
@@ -172,33 +175,6 @@ function love.keypressed(key)
 end
 
 function Input.mappingDown(mapping, mag)
-	if mapping == 'escape' then
-		local continue
-		continue = Interrupt{
-			draw = function(draw)
-				draw()
-				love.graphics.setColor(0,0,0,200)
-				love.graphics.rectangle('fill', 0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
-
-				love.graphics.setColor(255,255,255)
-				love.graphics.setFont(Font[30])
-				love.graphics.printf("PAUSE", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-			end, update = function() Input.update() end,
-		}
-
-		local mappingDown = Input.mappingDown
-		Input.mappingDown = function(mapping, mag)
-			if mapping == 'escape' then
-				love.audio.stop()
-				GS.switch(State.menu)
-				continue()
-				Input.mappingDown = mappingDown
-			elseif mapping == 'action' then
-				continue()
-				Input.mappingDown = mappingDown
-			end
-		end
-	end
 	GS.mappingDown(mapping, mag)
 end
 

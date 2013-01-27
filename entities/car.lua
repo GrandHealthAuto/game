@@ -369,6 +369,8 @@ function car:getTargetPosition()
 end
 
 function car:update(dt)
+	self.flock:maybeRelocate(self)
+
 	self.hitList = {}
 	self:updateFromPhysics()
 	-- behavior
