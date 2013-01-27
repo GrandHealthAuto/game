@@ -94,7 +94,7 @@ function st:mappingDown(mapping)
 	elseif mapping == 'down' then
 		Gui.keyboard.pressed('select-next')
 	elseif mapping == 'action' then
-		Gui.keyboard.pressed('return')
+		Gui.keyboard.pressed('return', -1)
 	else
 		return
 	end
