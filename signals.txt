@@ -6,14 +6,19 @@ XXX: Wenn ausserhalb von states/game.lua signale benutzt werden,
      muss State.game:leave() angepasst werden
 ================================================================
 
-victim-pickup-timer (number progress in [0:1])
+quest-timer (number progress in [0:1])
     - update victim pickup/delivery progress
 
-victim-pickup-abort
+quest-abort
     - victim pickup/deliver was aborted (player left zone)
 
+quest-finish
+    - victim pickup/deliver was successful (player stayed zone)
+
 victim-picked-up
-    - victim picked up/delivered (player stayed in zone)
+    - victim picked up
+victim-deliviered
+    - victim delivered at hospital
 
 get-next-victim
     - request new victim to pick up. may emit game-over
@@ -21,5 +26,5 @@ get-next-victim
 pedestrian-killed (pedestrian)
     - pedestrian was injured by the ambulance
 
-game-over (string reason: one of "no more victims", "victim died in car")
-    - game over because of reason
+game-over
+    - game over

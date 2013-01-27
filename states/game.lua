@@ -105,27 +105,35 @@ function st:enter()
 	self.current_passanger = false
 	self.pickup_progress   = 0
 
-	Signal.register('victim-pickup-timer', function(p)
+	Signal.register('quest-timer', function(p)
 		self.pickup_progress = p
 	end)
 
-	Signal.register('victim-pickup-abort', function()
+	Signal.register('quest-abort', function()
 		self.pickup_progress = 0
 	end)
 
+	Signal.register('victim-delivered', function()
+		self.current_passanger = false
+		hs:add(100)
+		Signal.emit('get-next-victim')
+	end)
+
 	Signal.register('victim-picked-up', function()
+		hs:add(50)
+		self.victims[self.current_target] = nil
+		self.current_passanger = self.current_target
+		self.current_passanger:stabilize()
+		self.current_target = false
+		self.marker.physics.body:setPosition(map.rescue_zone:unpack())
+		self.marker:updateFromPhysics()
+	end)
+
+	Signal.register('quest-finish', function()
 		if self.current_passanger then -- deliver at hospital
-			self.current_passanger = false
-			hs:add(100)
-			Signal.emit('get-next-victim')
+			Signal.emit('victim-delivered')
 		else -- pick up victim
-			hs:add(50)
-			self.victims[self.current_target] = nil
-			self.current_passanger = self.current_target
-			self.current_passanger:stabilize()
-			self.current_target = false
-			self.marker.physics.body:setPosition(map.rescue_zone:unpack())
-			self.marker:updateFromPhysics()
+			Signal.emit('victim-picked-up')
 		end
 	end)
 

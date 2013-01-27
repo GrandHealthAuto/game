@@ -38,10 +38,10 @@ function marker:beginContact(other)
 	local t = 0
 	self.countown_timer = Timer.do_for(2, function(dt)
 		t = t + dt
-		Signal.emit('victim-pickup-timer', t / 2)
+		Signal.emit('quest-timer', t / 2)
 	end, function()
 		if self.playerInRange then
-			Signal.emit('victim-picked-up')
+			Signal.emit('quest-finish')
 		end
 	end)
 end
@@ -50,7 +50,7 @@ function marker:endContact(other)
 	if other ~= State.game.player then return end
 	self.playerInRange = false
 	Timer.cancel(self.countown_timer)
-	Signal.emit('victim-pickup-abort')
+	Signal.emit('quest-abort')
 end
 
 return marker
