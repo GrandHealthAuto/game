@@ -149,6 +149,40 @@ function st:enter()
 		Entities.remove(pedestrian)
 	end)
 
+	-- game-over
+	Signal.register('game-over', function (reason)
+		local continue
+		continue = Interrupt{
+			draw = function(draw)
+				draw()
+				love.graphics.setColor(0,0,0,200)
+				love.graphics.rectangle('fill', 0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
+
+				love.graphics.setColor(255,255,255)
+				love.graphics.setFont(Font.XPDR[16])
+				love.graphics.printf("- Game Over -", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
+				love.graphics.printf(reason, 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 30,SCREEN_WIDTH, 'center')
+				love.graphics.printf("Press [Escape] to quit game", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 60,SCREEN_WIDTH, 'center')
+				love.graphics.printf("or [Return] to restart", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 90,SCREEN_WIDTH, 'center')
+			end,
+			update = function() Input.update() end,
+		}
+
+		local mappingDown = Input.mappingDown
+		Input.mappingDown = function(mapping, mag)
+			if mapping == 'escape' then
+				love.audio.stop()
+				GS.switch(State.menu)
+				continue()
+				Input.mappingDown = mappingDown
+			elseif mapping == 'action' then
+				GS.switch(State.game)
+				continue()
+				Input.mappingDown = mappingDown
+			end
+		end
+	end)
+
 	Entities.registerPhysics(self.world)
 
 	self:spawn_target()
@@ -181,17 +215,20 @@ function st:mappingDown(mapping)
 				love.graphics.printf("- PAUSE -", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
 				love.graphics.printf("Press [Escape] to quit game", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 30,SCREEN_WIDTH, 'center')
 				love.graphics.printf("or [Return] to continue", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 60,SCREEN_WIDTH, 'center')
-			end, update = function() Input.update() end,
+			end,
+			update = function() Input.update() end,
+			transition = function() end
 		}
 
 		local mappingDown = Input.mappingDown
 		Input.mappingDown = function(mapping, mag)
 			if mapping == 'escape' then
 				love.audio.stop()
-				GS.switch(State.menu)
 				continue()
+				GS.switch(State.menu)
 				Input.mappingDown = mappingDown
 			elseif mapping == 'action' then
+				print ("got something")
 				continue()
 				Input.mappingDown = mappingDown
 			end
