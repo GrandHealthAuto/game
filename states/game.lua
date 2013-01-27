@@ -60,7 +60,7 @@ function st:registerSignals()
 	end)
 
 	Signal.register('victim-delivered', function()
-		local points = 100 + (math.floor(self.current_passanger.heartrate / 10) * 10)
+		local points = 100 + (math.floor((self.current_passanger.heartrate * 0.25) / 10) * 10)
 		print (points)
 		hs:add(points)
 		self.current_passanger = false
