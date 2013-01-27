@@ -132,6 +132,8 @@ function pedestrian:detectCollision(hitList)
 end
 
 function pedestrian:update(dt)
+	self.flock:maybeRelocate(self)
+
 	-- behavior
 	self:updateFromPhysics()
 
@@ -170,6 +172,7 @@ function pedestrian:update(dt)
 end
 
 function pedestrian:beginContact (other_entity, contact_point, contact_normal, contact_velocity) 
+	if other_entity ~= State.game.player then return end
 	local impact = -contact_normal * contact_velocity
 
 	if impact > GVAR.pedestrian_impact_kill then

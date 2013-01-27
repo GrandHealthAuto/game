@@ -13,7 +13,14 @@ local monitor = class{name = 'Heartmonitor',
 }
 
 function monitor:draw()
-	love.graphics.draw(Image.heart, self.x,self.y, 0, self.scale, self.scale, self.ox, self.oy)
+	local victim = State.game.current_target or State.game.current_passanger
+	local h = {Image.heart, Image.heart_gray}
+	local p = math.min(1, victim.heartrate / 100)
+	love.graphics.setColor(255,255,255,(1-p)*255)
+	love.graphics.draw(h[2], self.x,self.y, 0, self.scale, self.scale, self.ox, self.oy)
+	love.graphics.setColor(255,255,255,p*255)
+	love.graphics.draw(h[1], self.x,self.y, 0, self.scale, self.scale, self.ox, self.oy)
+	love.graphics.setColor(255,255,255)
 end
 
 function monitor:drawMarker()

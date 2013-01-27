@@ -78,6 +78,7 @@ return function(map_path, tile_info, tile_data)
 					q = quads[tile.name],
 					is_street   = tile.name:match('street$'),
 					is_sidewalk = tile.name:match('sidewalk$'),
+					is_walkable = not tile.is_collision_tile,
 				}
 			end
 			if tile.is_rescue_zone then
