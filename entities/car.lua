@@ -6,7 +6,9 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.angle = 0
 		self.shape_offset = vector(9,0)
 		self.targetPos = pos
-		self.speed = 150
+		self.speed = 40
+		self.speedMultiplier = 1
+		self.speedReverse = 150
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
@@ -23,7 +25,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		)
 		self.direction = 'south'
 		self.hitList = {}
-		self.debug = true
+		self.debug = false
 	end
 }
 
@@ -34,10 +36,13 @@ function car:getCollisionLines()
 	local xV = vector (math.cos(self.angle), math.sin(self.angle))
 	local yV = xV:rotated(math.pi / 2)
 
-	local x, y = 40, 4
+	local x, y = 42, 2
 	local headingLeft = self.pos + x * xV - y * yV
 	local headingRight = self.pos + x * xV + y * yV
-
+	table.insert(lines, {x1 = headingLeft.x, y1 = headingLeft.y, x2 = headingRight.x, y2 = headingRight.y })
+	local x, y = 38, 9
+	local headingLeft = self.pos + x * xV - y * yV
+	local headingRight = self.pos + x * xV + y * yV
 	table.insert(lines, {x1 = headingLeft.x, y1 = headingLeft.y, x2 = headingRight.x, y2 = headingRight.y })
 	return lines
 end
@@ -78,8 +83,14 @@ end
 
 function car:updateStateMachine()
 	if self.state == 'drive' then
+		local now = love.timer.getMicroTime()
 		if #self.hitList > 0 then
+			self.speedMultiplier = 1
 			self:setState('pause')
+	    elseif now - self.lastStateUpdate > 1 and self.speedMultiplier < 10 then
+			self.speedMultiplier = self.speedMultiplier + 1
+			self.lastStateUpdate = now
+			--self:log("Increase multiplier to " .. self.speedMultiplier)
 		end
 	elseif self.state == 'pause' then
 		local now = love.timer.getMicroTime()
@@ -125,15 +136,15 @@ function car:updatePosition(dt, angle)
 	self.velocity = vector(0, 0)
 
 	if self.state == 'drive' then
-		self.velocity = heading * self.speed
+		self.velocity = heading * self.speed * self.speedMultiplier
 		self.angle_velocity = 0.2 * angleD / dt
 	elseif self.state == 'pause' then
 		self.velocity = vector(0, 0)
 	elseif self.state == 'reverseLeft' then
-		self.velocity = heading * self.speed * -0.5
+		self.velocity = heading * self.speedReverse * -1
 		self.angle_velocity = math.pi
 	elseif self.state == 'reverseRight' then
-		self.velocity = heading * self.speed * -0.5
+		self.velocity = heading * self.speedReverse * -1
 		self.angle_velocity = - math.pi
 	end
 end
@@ -207,53 +218,78 @@ end
 -- map: current tile map
 -- pos: current tile map position
 -- v: current direction on tile map
-function car:searchStreet(map, pos, v)
+-- from: start tile offset
+-- to: end tile offset
+function car:searchStreetCircle(map, pos, v, from, to)
 	-- search each tile for maximum distance
-	local distance = 5
 	-- search in front
-	for i = 1,distance do
+	for i = from,to do
 		local probe = pos + i*v
+		--self:log("probe ahead " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
 
 	local rV = v:rotated(math.pi / 2)
 	-- search to the right
-	for i = 1,distance do
+	for i = from,to do
 		local probe = pos + i*rV
+		--self:log("probe right " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getRightDirection(self.direction)
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
 
 	-- search to the left
-	for i = 1,distance do
+	for i = from,to do
 		local probe = pos - i*rV
+		--self:log("probe left " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getLeftDirection(self.direction)
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
 
 	-- search to the back
-	for i = 1,distance do
-		local probe = pos - i*V
+	for i = from,to do
+		local probe = pos - i*v
+		--self:log("probe back " .. tostring(probe))
 		if map:isStreet(probe.x, probe.y) then
 			self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
 			return map:mapCoordsCenter(probe.x, probe.y)
-		elseif not map:isStreet(probe.x, probe.y) then
+		elseif not map:isSidewalk(probe.x, probe.y) then
 			break
 		end
 	end
+	return nil
+end
+
+-- Search for a street on tile map and return game coordinates by enlarging
+-- search circles
+--
+-- map: current tile map
+-- pos: current tile map position
+-- v: current direction on tile map
+function car:searchStreet(map, pos, v)
+	for distance = 1,20,3 do
+		local target = self:searchStreetCircle(map, pos, v, 1, distance)
+		if target then
+			return target
+		end
+	end
+
 	self:log('Panic: Do not know where to go')
+	local probe = pos - v
+	self.direction = self:getLeftDirection(self:getLeftDirection(self.direction))
+	return map:mapCoordsCenter(probe.x, probe.y)
 end
 
 -- map: current tile map
@@ -333,6 +369,8 @@ function car:getTargetPosition()
 end
 
 function car:update(dt)
+	self.flock:maybeRelocate(self)
+
 	self.hitList = {}
 	self:updateFromPhysics()
 	-- behavior

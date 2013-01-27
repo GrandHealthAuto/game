@@ -1,8 +1,7 @@
 local highscore = require "highscore"
 local hs = highscore(GVAR['player_name'])
-local hsData= hs:getHighscore(0)
 local st = GS.new()
-
+local oldScore = 0
 st.world = {}
 
 function st:resetWorld()
@@ -13,6 +12,7 @@ function st:resetWorld()
 		function(a, b, coll) self:endContact (a, b, coll) end
 		)
 	hs:set(0)
+	oldScore = hs:getSavedHighscore()
 	print ("resetting world")
 end
 
@@ -54,19 +54,6 @@ function st:init()
 	self.map = map
 end
 
-function st:getStreetPos()
-	local w = map.width
-	local h = map.height
-	for i = 0, 100 do
-		local x = math.floor(math.random(0, w))
-		local y = math.floor(math.random(0, h))
-		if map:isStreet(x, y) then
-			return map:mapCoordsCenter(x, y)
-		end
-	end
-	return map:mapCoordsCenter(math.floor(math.random(0, w)), math.floor(math.random(0, h)))
-end
-
 function st:enter()
 	self:resetWorld()
 
@@ -76,19 +63,8 @@ function st:enter()
 
 	self.player = Entity.player(map.rescue_zone)
 
-	-- pedestrians
-	self.flock = Entity.flock(50)
-
-	for i = 1,40 do
-		local pos = vector(math.random(0,160 * 32), math.random(0,160 * 32))
-		pos = self:getStreetPos()
-		--local car = Entity.car (vector(map.rescue_zone.x + i * 100, map.rescue_zone.y + 30), 0, "Car " .. i)
-		--car.state = 'reverseLeft'
-		--car.direction = 'east'
-		--car.angle = math.pi - math.random(0,1) + 0.5
-		local car = Entity.car (pos, 0, "Car " .. i)
-		--car:log(car.pos.x .. "," .. car.pos.y .. " " .. car.targetPos.x .. "," .. car.targetPos.y)
-	end
+	-- pedestrians and cars
+	self.flock = Entity.flock(50, 10)
 
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
@@ -139,7 +115,7 @@ function st:enter()
 
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
-		hs:add(-100)
+		-- hs:add(-100)
 		Sound.static["shout"..math.random(2)]:play()
 		local v = Entity.victim(pedestrian.pos)
 		v.color = pedestrian.color
@@ -181,7 +157,10 @@ end
 
 function st:draw()
 	love.graphics.setColor(255,255,255)
+	local cs = self.cam.scale
+	self.cam.scale = .5
 	self.cam:attach()
+	self.cam.scale = cs
 	map:draw(self.cam)
 	Entities.draw()
 
@@ -192,7 +171,14 @@ function st:draw()
 	self.heart_monitor:drawMarker()
 	self.cam:detach()
 
+	scoretext = ""
+	if oldScore then
+		scoretext = scoretext .. " Previous Score: "..oldScore
+	end
+	love.graphics.printf(scoretext .." Score: "..hs.value, 0,4, SCREEN_WIDTH-15, 'right')
 	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
+	love.graphics.printf((self.player.gui_speed .. " km/h"), 0, SCREEN_HEIGHT - 20, SCREEN_WIDTH-10, 'right')
+
 	self.heart_monitor:draw()
 	self.radio:draw()
 end
