@@ -1,10 +1,10 @@
-GHA - Great Health Auto
+GHA - Grand Health Auto
 =======================
 
 A GTA parody @ GGJ 2013
 -----------------------
 
-Great Health Auto is small parody of GTA where an ambulant driver must rescue
+Grand Health Auto is small parody of GTA where an ambulant driver must rescue
 several accident victims due the game. 
 
 The ambulant car driver needs to collect injured victims and brings him to the
