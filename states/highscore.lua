@@ -15,7 +15,7 @@ end
 
 function st:update(dt)
 	local w = (SCREEN_WIDTH-50)/2
-	love.graphics.setFont(Font.XPDR[24])
+	love.graphics.setFont(Font.XPDR[20])
 	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .51}, function()
 		if hsData then
 			for i = 1,math.min(#hsData, 7) do
@@ -33,17 +33,17 @@ function st:update(dt)
 	love.graphics.setFont(Font.XPDR[16])
 	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT - 90}, function()
 		Gui.group{grow="right", size={w}, function()
-			if Gui.Button{text="Previous Page"} then
+			if Gui.Button{text="PREVIOUS PAGE"} then
 				offset = offset - 7
 				if offset < 0 then offset = 0 end
 				hsData = hs:getHighscore(offset)
 			end
-			if Gui.Button{text="Next Page"} then
+			if Gui.Button{text="NEXT PAGE"} then
 				offset = offset + 7
 				hsData = hs:getHighscore(offset)
 			end
 		end}
-		if Gui.Button{text="Back"} then
+		if Gui.Button{text="BACK"} then
 			GS.transition(.5, State.menu)
 		end
 	end}
@@ -76,5 +76,6 @@ function st:mappingDown(mapping)
 	mouse_hot = Gui.mouse.getHot()
 	-- FIXME: play sound
 end
+
 
 return st
