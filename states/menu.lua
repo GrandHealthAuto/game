@@ -27,8 +27,6 @@ function st:enter()
 	if not self.music then
 		self.music = Sound.stream.menu:play()
 		self.music:setLooping(true)
-	elseif self.music:isStopped() then
-		self.music:play()
 	end
 end
 
@@ -38,7 +36,8 @@ function st:update(dt)
 	love.graphics.setFont(Font.XPDR[16])
 	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .6}}
 	if Gui.Button{text="Start"} then
-		self.music:pause()
+		self.music:stop()
+		self.music = false
 		GS.transition(1, State.game)
 	end
 	if Gui.Button{text="Highscore"} then
