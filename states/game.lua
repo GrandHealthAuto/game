@@ -147,12 +147,6 @@ function st:enter()
 		self.marker:updateFromPhysics()
 		self.pickup_progress = 0
 	end)
-
-	Signal.register('game-over', function()
-		print "game over"
-		hs:save()
-		st:showHighscore()
-	end)
 	
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
