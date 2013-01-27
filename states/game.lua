@@ -63,6 +63,8 @@ function st:enter()
 
 	self.player = Entity.player(map.rescue_zone)
 
+	self.notification = Entity.notification ("undefined")
+
 	-- pedestrians and cars
 	self.flock = Entity.flock(50, 10)
 
@@ -208,6 +210,8 @@ function st:draw()
 
 	self.heart_monitor:draw()
 	self.radio:draw()
+
+	self.notification:draw()
 end
 
 function st:update(dt)
