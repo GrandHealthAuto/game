@@ -182,6 +182,7 @@ function st:spawn_target()
 end
 
 function st:enter()
+	love.mouse.setVisible(false)
 	self:resetWorld()
 
 	local s = (require 'hump.signal').new() -- hackety hack
@@ -277,6 +278,7 @@ function st:leave()
 	Signal.clear()
 	Entities.clear()
 	self.player = nil
+	love.mouse.setVisible(true)
 end
 
 function st:draw()
