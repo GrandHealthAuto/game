@@ -22,7 +22,7 @@ function st:update(dt)
 		Gui.Input{info = inputInfo}
 		if Gui.Button{text="Start"} then
 			GVAR['player_name'] = inputInfo["text"]
-			GS.switch(State.menu)
+			GS.transition(.5, State.menu)
 		end
 	Gui.group.pop{}
 	-- on mouse move -> set widget focus to mouse

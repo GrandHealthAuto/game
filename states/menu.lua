@@ -21,10 +21,10 @@ end
 function st:update(dt)
 	Gui.group.push{grow = "down", pos={SCREEN_WIDTH/2-Gui.group.default.size[1]/2,SCREEN_HEIGHT/2}}
 	if Gui.Button{text="Start"} then
-		GS.switch(State.game)
+		GS.transition(1, State.game)
 	end
 	if Gui.Button{text="Highscore"} then
-		GS.switch(State.highscore)
+		GS.transition(.5, State.highscore)
 	end
 	if Gui.Button{text="Options"} then
 	end
@@ -33,7 +33,7 @@ function st:update(dt)
 	end
 
 	if Gui.Button{text="DELETE ME (firstrun)"} then
-		GS.switch(State.firstrun)
+		GS.transition(.5, State.firstrun)
 	end
 	
 	-- on mouse move -> set widget focus to mouse

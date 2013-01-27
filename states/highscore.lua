@@ -41,7 +41,7 @@ function st:update(dt)
 		drawHighscore(hsData)
 		
 		if Gui.Button{text="Back"} then
-			GS.switch(State.menu)
+			GS.transition(.5, State.menu)
 		end
 		
 		-- on mouse move -> set widget focus to mouse

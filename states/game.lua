@@ -157,10 +157,10 @@ end
 
 function st:draw()
 	love.graphics.setColor(255,255,255)
-	local cs = self.cam.scale
-	self.cam.scale = .5
+	--local cs = self.cam.scale
+	--self.cam.scale = .5
 	self.cam:attach()
-	self.cam.scale = cs
+	--self.cam.scale = cs
 	map:draw(self.cam)
 	Entities.draw()
 
@@ -196,7 +196,7 @@ function st:update(dt)
 	end
 
 	-- awesome camera zooming
-	--cam:zoomTo(2. -  self.player.velocity:len() * 0.001)
+	self.cam:zoomTo(2.1 -  1 / (1 + math.exp(-.02 * self.player.velocity:len() + 5)) * .2)
 
 	self.cam.direction = self.cam.target - self.cam.pos
 	local delta = self.cam.direction * dt * 4

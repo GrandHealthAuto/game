@@ -46,7 +46,7 @@ function serialize(t, indent)
 	end
 end
 
-function GS.transition(to, length, ...)
+function GS.transition(length, to, ...)
 	length = length or 1
 
 	local fade_color, sw, t = {0,0,0,0}, GS.switch, 0
@@ -190,7 +190,7 @@ function Input.mappingDown(mapping, mag)
 		Input.mappingDown = function(mapping, mag)
 			if mapping == 'escape' then
 				love.audio.stop()
-				GS.switch(State.menu)
+				GS.transition(.5, State.menu)
 				continue()
 				Input.mappingDown = mappingDown
 			elseif mapping == 'action' then
