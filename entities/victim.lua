@@ -8,11 +8,26 @@ local victim = class{name = 'Victim',
 		self.color = {255, 255, 255, 255}
 
 		self.heartrate = 100
+		self.heartrate_delta = (math.abs(self.pos.x - State.game.player.pos.x)
+			+ math.abs(self.pos.y - State.game.player.pos.y)
+--			+ math.abs (self.pos.x - State.game.map.rescue_zone.x)
+--			+ math.abs(self.pos.y - State.game.map.rescue_zone.y))
+			)/ 400
 
 		self.is_stabilized = false
 		Entities.add(self)
 	end
 }
+
+function victim:init_heartrate_delta()
+	print ("innit heart rate")
+		self.heartrate_delta = (math.abs(self.pos.x - State.game.player.pos.x)
+			+ math.abs(self.pos.y - State.game.player.pos.y)
+--			+ math.abs (self.pos.x - State.game.map.rescue_zone.x)
+--			+ math.abs(self.pos.y - State.game.map.rescue_zone.y))
+			)/ 400
+
+end
 
 function victim:draw()
 	if not self.is_stabilized then
@@ -27,7 +42,7 @@ end
 
 function victim:update(dt)
 	if not self.is_stabilized then
-		self.heartrate = self.heartrate - 100 / 30. * dt -- 15 seconds to flatline
+		self.heartrate = self.heartrate - self.heartrate_delta * dt -- 15 seconds to flatline
 		if self.heartrate <= 0 then
 			Entities.remove(self)
 			State.game.victims[self] = nil
@@ -37,7 +52,7 @@ function victim:update(dt)
 		end
 	else
 		-- FIXME: heartrate modification according to driving style
-		self.heartrate = self.heartrate - 100 / 30 * dt -- 20 seconds to flatline
+		self.heartrate = self.heartrate - self.heartrate_delta * dt -- 20 seconds to flatline
 		if self.heartrate <= 0 or self.heartrate > 150 and State.game.current_target == self then
 			Signal.emit('game-over', 'victim died in car')
 		end

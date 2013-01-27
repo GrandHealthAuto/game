@@ -91,6 +91,7 @@ function st:init()
 			return self:spawn_target()
 		end
 		self.current_target = target
+		target:init_heartrate_delta()
 		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
 		self.marker:updateFromPhysics()
 		self.pickup_progress = 0
@@ -251,7 +252,7 @@ end
 
 function st:leave()
 	hs:save()
-	Signal.clear_pattern(".*")
+	Signal.clear()
 	Entities.clear()
 	self.player = nil
 end
