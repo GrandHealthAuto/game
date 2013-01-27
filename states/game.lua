@@ -3,6 +3,7 @@ local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
 st.world = {}
+st.camMargin = 100
 
 function st:resetWorld()
 	st.world = love.physics.newWorld()
@@ -52,9 +53,100 @@ local map, geometry
 function st:init()
 	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	self.map = map
+
+	Signal.register('quest-timer', function(p)
+		self.pickup_progress = p
+	end)
+
+	Signal.register('quest-abort', function()
+		self.pickup_progress = 0
+	end)
+
+	Signal.register('victim-delivered', function()
+		self.current_passanger = false
+		hs:add(100)
+		Signal.emit('get-next-victim')
+	end)
+
+	Signal.register('victim-picked-up', function()
+		hs:add(50)
+		self.victims[self.current_target] = nil
+		self.current_passanger = self.current_target
+		self.current_passanger:stabilize()
+		self.current_target = false
+		self.marker.physics.body:setPosition(map.rescue_zone:unpack())
+		self.marker:updateFromPhysics()
+	end)
+
+	Signal.register('quest-finish', function()
+		if self.current_passanger then -- deliver at hospital
+			Signal.emit('victim-delivered')
+		else -- pick up victim
+			Signal.emit('victim-picked-up')
+		end
+	end)
+
+	Signal.register('get-next-victim', function()
+		local target = next(self.victims)
+		if not target then
+			return self:spawn_target()
+		end
+		self.current_target = target
+		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
+		self.marker:updateFromPhysics()
+		self.pickup_progress = 0
+	end)
+	
+	-- pedestrians
+	Signal.register('pedestrian-killed', function (pedestrian)
+		-- hs:add(-100)
+		Sound.static["shout"..math.random(2)]:play()
+		local v = Entity.victim(pedestrian.pos)
+		v.color = pedestrian.color
+		self.victims[v] = v
+		Entities.remove(pedestrian)
+	end)
+
+	-- game-over
+	Signal.register('game-over', function (reason)
+		hs:save()
+		local continue
+		continue = Interrupt{
+			draw = function(draw)
+				draw()
+				love.graphics.setColor(0,0,0,200)
+				love.graphics.rectangle('fill', 0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
+
+				love.graphics.setColor(255,255,255)
+				love.graphics.setFont(Font.XPDR[16])
+				love.graphics.printf("- Game Over -", 0,20,SCREEN_WIDTH, 'center')
+				love.graphics.printf(reason, 0,50,SCREEN_WIDTH, 'center')
+				love.graphics.printf("Press [Escape] to quit game", 0,80,SCREEN_WIDTH, 'center')
+				love.graphics.printf("or [Return] to restart", 0,110,SCREEN_WIDTH, 'center')
+				showHighscore()
+			end,
+			update = function() Input.update() end,
+		}
+
+		local mappingDown = Input.mappingDown
+		Input.mappingDown = function(mapping, mag)
+			if mapping == 'escape' then
+				love.audio.stop()
+				continue()
+				Input.mappingDown = mappingDown
+				GS.switch(State.menu)
+			elseif mapping == 'action' then
+				continue()
+				Input.mappingDown = mappingDown
+				GS.switch(State.game)
+			end
+		end
+	end)
 end
 
 function st:spawn_target()
+	print ("spawned target")
+
 	-- rotated bounding box
 	local xul,yul = self.cam:worldCoords(-SCREEN_WIDTH,-SCREEN_HEIGHT)
 	local xll,yll = self.cam:worldCoords(-SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -76,6 +168,7 @@ function st:spawn_target()
 
 	local v = Entity.victim(p*32-vector(16,16))
 	self.victims[v] = v
+	self.current_target = v
 	Signal.emit('get-next-victim')
 end
 
@@ -103,51 +196,6 @@ function st:enter()
 	self.current_target    = false
 	self.current_passanger = false
 	self.pickup_progress   = 0
-
-	Signal.register('victim-pickup-timer', function(p)
-		self.pickup_progress = p
-	end)
-
-	Signal.register('victim-pickup-abort', function()
-		self.pickup_progress = 0
-	end)
-
-	Signal.register('victim-picked-up', function()
-		if self.current_passanger then -- deliver at hospital
-			self.current_passanger = false
-			hs:add(100)
-			Signal.emit('get-next-victim')
-		else -- pick up victim
-			hs:add(50)
-			self.victims[self.current_target] = nil
-			self.current_passanger = self.current_target
-			self.current_passanger:stabilize()
-			self.current_target = false
-			self.marker.physics.body:setPosition(map.rescue_zone:unpack())
-			self.marker:updateFromPhysics()
-		end
-	end)
-
-	Signal.register('get-next-victim', function()
-		local target = next(self.victims)
-		if not target then
-			return self:spawn_target()
-		end
-		self.current_target = target
-		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
-		self.marker:updateFromPhysics()
-		self.pickup_progress = 0
-	end)
-
-	-- pedestrians
-	Signal.register('pedestrian-killed', function (pedestrian)
-		-- hs:add(-100)
-		Sound.static["shout"..math.random(2)]:play()
-		local v = Entity.victim(pedestrian.pos)
-		v.color = pedestrian.color
-		self.victims[v] = v
-		Entities.remove(pedestrian)
-	end)
 
 	Entities.registerPhysics(self.world)
 
@@ -181,17 +229,20 @@ function st:mappingDown(mapping)
 				love.graphics.printf("- PAUSE -", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
 				love.graphics.printf("Press [Escape] to quit game", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 30,SCREEN_WIDTH, 'center')
 				love.graphics.printf("or [Return] to continue", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 60,SCREEN_WIDTH, 'center')
-			end, update = function() Input.update() end,
+			end,
+			update = function() Input.update() end,
+			transition = function() end
 		}
 
 		local mappingDown = Input.mappingDown
 		Input.mappingDown = function(mapping, mag)
 			if mapping == 'escape' then
 				love.audio.stop()
-				GS.switch(State.menu)
 				continue()
+				GS.switch(State.menu)
 				Input.mappingDown = mappingDown
 			elseif mapping == 'action' then
+				print ("got something")
 				continue()
 				Input.mappingDown = mappingDown
 			end
@@ -200,8 +251,7 @@ function st:mappingDown(mapping)
 end
 
 function st:leave()
-	hs:save()
-	Signal.clear()
+	Signal.clear_pattern(".*")
 	Entities.clear()
 	self.player = nil
 end
@@ -258,7 +308,7 @@ function st:update(dt)
 	if math.abs(self.cam.direction.y) > SCREEN_HEIGHT/3 then
 		delta.y = self.cam.direction.y
 	end
-	self.cam.pos = self.cam.pos + delta
+	self.cam.pos = self.map:adjustInboundPos(self.cam.pos + delta, self.camMargin)
 	self.cam:lookAt(math.floor(self.cam.pos.x+.5), math.floor(self.cam.pos.y+.5))
 
 	self.world:update(dt)
@@ -266,5 +316,20 @@ function st:update(dt)
 	self.heart_monitor:update(dt)
 	Entities.update(dt)
 end
+
+function showHighscore()
+	love.graphics.setColor(255,255,255)
+	love.graphics.setFont(Font.XPDR[16])
+
+	local height = 160;
+	love.graphics.printf("- Highscore -", 0,height, SCREEN_WIDTH, 'center')
+	hsData = hs:getHighscore(0)
+	for i, player in pairs(hsData) do
+		height = height +20
+		love.graphics.printf(player["value"],SCREEN_WIDTH /4 - 30,height, SCREEN_WIDTH /4, 'right' )
+		love.graphics.printf(player["name"],(SCREEN_WIDTH /4) * 2, height, SCREEN_WIDTH /4, 'left')
+		--.. player["name"] .. " (" .. player["rank"] .. ".)", 0,height, SCREEN_WIDTH, 'left')
+	end
+end 
 
 return st

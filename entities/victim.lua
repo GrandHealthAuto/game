@@ -27,17 +27,18 @@ end
 
 function victim:update(dt)
 	if not self.is_stabilized then
-		self.heartrate = self.heartrate - 100 / 30 * dt -- 30 seconds to flatline
+		self.heartrate = self.heartrate - 100 / 30. * dt -- 15 seconds to flatline
 		if self.heartrate <= 0 then
 			Entities.remove(self)
 			State.game.victims[self] = nil
 			if State.game.current_target == self then
-				Signal.emit('get-next-victim')
+				Signal.emit('game-over', 'victim was not rescued')
 			end
 		end
 	else
 		-- FIXME: heartrate modification according to driving style
-		if self.heartrate <= 0 or self.heartrate > 150 then
+		self.heartrate = self.heartrate - 100 / 30 * dt -- 20 seconds to flatline
+		if self.heartrate <= 0 or self.heartrate > 150 and State.game.current_target == self then
 			Signal.emit('game-over', 'victim died in car')
 		end
 	end

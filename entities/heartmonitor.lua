@@ -17,6 +17,7 @@ function monitor:draw()
 	local w, h = math.floor(self.w * self.scale), math.floor(self.h * self.scale)
 	local x, y = math.floor(self.x-w/2), math.floor(self.y-h/2)
 	local p = 1 - math.min(1, victim.heartrate / 150)
+	local p = p * .76 -- hackety hack
 
 	love.graphics.setScissor(x,y, w, p*h)
 	love.graphics.draw(Image.heart_gray, self.x,self.y, 0, self.scale, self.scale, self.w/2, self.h/2)
