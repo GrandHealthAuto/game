@@ -157,10 +157,7 @@ function st:enter()
 	Signal.emit('get-next-victim')
 
 	self.heart_monitor = Entity.heartmonitor()
-	
-	self.radio = Sound.static.reggae:play()
-	self.radio:setVolume(0.5)
-	self.radio:setLooping()
+	self.radio = Entity.radio()
 	st.sirensfx = false
 end
 
@@ -199,6 +196,7 @@ function st:draw()
 
 	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
 	self.heart_monitor:draw()
+	self.radio:draw()
 end
 
 function st:update(dt)
