@@ -106,7 +106,7 @@ function st:enter()
 	Signal.register('get-next-victim', function()
 		local target = next(self.victims)
 		if not target then
-			hs:showHighscore()
+			st:showHighscore()
 			Signal.emit('game-over', 'no more victims')
 			return
 		end
