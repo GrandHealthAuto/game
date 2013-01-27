@@ -16,6 +16,11 @@ function st:enter()
 	Gui.mouse.setActive(nil)
 end
 
+function st:leave()
+	Gui.keyboard.pressed()
+	Gui.keyboard.setFocus(nil)
+end
+
 local t = 0
 function st:update(dt)
 	t = t + dt
@@ -28,6 +33,8 @@ function st:update(dt)
 			if Gui.Button{text="Start"} then
 				GVAR['player_name'] = inputInfo["text"]
 				GS.transition(.5, State.game)
+				State.menu.music:stop()
+				State.menu.music = false
 			end
 		end
 		Gui.group.pop{}

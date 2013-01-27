@@ -1,5 +1,5 @@
-Great Health Auto
-=================
+GHA - Great Health Auto
+=======================
 
 A GTA parody @ GGJ 2013
 -----------------------
@@ -15,3 +15,18 @@ starts.
 It's an awesome game between live and dead, between heart beats and music,
 between caring and greedy. You will love your car and the city. But watch out
 for traffic jams!
+
+
+Installation
+------------
+
+The game is writting in [lua](http://lua.org) using the great game engine
+[love2d.org](https://loeve2d.org) and can run under Windows, Mac and our
+beloved Linux. If you haven't installed love yet, please do so.
+
+Download GHA [Zip
+File](https://github.com/GrandHealthAuto/game/archive/master.zip) and unzip to
+a preferred directory. Then run
+
+    $ cd <unzip GHA dir file>
+    $ love .
