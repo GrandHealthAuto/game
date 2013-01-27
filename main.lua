@@ -11,6 +11,8 @@ Tween      = require "tween"
 
 require 'slam'
 
+function print() end
+
 -- evil global variables
 GVAR = {
 	draw_collision_boxes = false,
