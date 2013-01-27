@@ -26,8 +26,19 @@ function st:enter()
 
 	if not self.music then
 		self.music = Sound.stream.menu:play()
+		self.music:seek(math.random()*90)
 		self.music:setLooping(true)
+		local amp = 0
+		Timer.do_for(2, function(dt)
+			amp = amp + dt / 2
+			self.music:setVolume(amp)
+		end, function() self.music:setVolume(1) end)
 	end
+end
+
+function st:leave()
+	Gui.keyboard.pressed()
+	Gui.keyboard.setFocus(nil)
 end
 
 local t = 0
@@ -35,17 +46,16 @@ function st:update(dt)
 	t = t + dt
 	love.graphics.setFont(Font.XPDR[16])
 	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .6}}
-	if Gui.Button{text="Start"} then
-		self.music:stop()
-		self.music = false
-		GS.transition(1, State.entername)
+	if Gui.Button{text="START"} then
+		GS.switch(State.entername)
 	end
-	if Gui.Button{text="Highscore"} then
-		GS.transition(.5, State.highscore)
+	if Gui.Button{text="HIGHSCORES"} then
+		GS.switch(State.highscore)
 	end
-	if Gui.Button{text="Options"} then
+	if Gui.Button{text="CREDITS"} then
+		GS.transition(.5, State.credits)
 	end
-	if Gui.Button{text="Quit"} then
+	if Gui.Button{text="QUIT"} then
 		love.event.push('quit')
 	end
 
