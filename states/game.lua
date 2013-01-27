@@ -4,7 +4,7 @@ local st = GS.new()
 local oldScore = 0
 local hsData = nil
 st.world = {}
-local pixelEffects = {require "effects/lights"}
+local pixelEffects = {require "effects/bluelights"}
 local sTime =0
 
 function st:resetWorld()
@@ -332,8 +332,9 @@ function st:update(dt)
 	
 	sTime = sTime + dt
 	if sTime >= 1 then sTime = 0 end
-	pixelEffects[1]:send("time",sTime)
-	pixelEffects[1]:send("center", {0.5425,0.5})
+	---pixelEffects[1]:send("time",sTime)
+	pixelEffects[1]:send("light1", {0.5425,0.2})
+	pixelEffects[1]:send("light2", {0.5425,0.8})
 end
 
 function showHighscore()
