@@ -46,7 +46,7 @@ function st:mappingDown(mapping)
 end
 
 function st:keypressed(key,code)
-	if (code >= 65 and code <= 90) or (code >=97 and code <=122) or code == 8 or code == 9  or code == 32 then
+	if (code >= 65 and code <= 90) or (code >=97 and code <=122) or code == 8 or code == 9  or code == 32 or key=="return" then
 		Gui.keyboard.pressed(key, code)
 	end
 end
