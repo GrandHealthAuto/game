@@ -2,6 +2,7 @@ local highscore = require "highscore"
 local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
+local hsData = nil
 st.world = {}
 
 function st:resetWorld()
@@ -110,6 +111,7 @@ function st:init()
 	-- game-over
 	Signal.register('game-over', function (reason)
 		hs:save()
+		hsData = hs:getHighscore(0)
 		love.audio.stop()
 
 		local continue
@@ -327,7 +329,6 @@ function showHighscore()
 
 	local height = 160;
 	love.graphics.printf("- Highscore -", 0,height, SCREEN_WIDTH, 'center')
-	hsData = hs:getHighscore(0)
 	for i, player in pairs(hsData) do
 		height = height +20
 		love.graphics.printf(player["value"],SCREEN_WIDTH /4 - 30,height, SCREEN_WIDTH /4, 'right' )

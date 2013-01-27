@@ -22,7 +22,7 @@ function st:update(dt)
 		},
 	}
 	
-		Gui.group.push{ grow="right", size={ 400, 30}}
+		Gui.group.push{ grow="right", size={ 400, 20}}
 		
 			if Gui.Button{text="Previous Page"} then
 				offset = offset - 25
@@ -38,14 +38,14 @@ function st:update(dt)
 		
 		Gui.group.pop()
 		
-		Gui.group.push{ grow="right", size={ 300, 30}, pos={10,10} }
+		Gui.group.push{ grow="right", size={ 300, 30}, pos={30,5} }
 			Gui.Label{text="Rank", size={100, 30}} Gui.Label{text="Name"} Gui.Label { text="Score"}
 		Gui.group.pop{}
 				
 		if hsData then
 			for i, player in pairs(hsData) do
-				Gui.group.push{ grow="right", size={ 300, 30}, pos={10,0} }
-					Gui.Label{text=player["rank"], size={100, 30}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
+				Gui.group.push{ grow="right", size={ 300, 20}, pos={30,0} }
+					Gui.Label{text=player["rank"], size={100, 20}} Gui.Label{text=player["name"]} Gui.Label { text=player["value"], align="right"}
 				Gui.group.pop{}
 			end
 		else
