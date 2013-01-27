@@ -1,8 +1,7 @@
 local highscore = require "highscore"
 local hs = highscore(GVAR['player_name'])
-local hsData= hs:getHighscore(0)
 local st = GS.new()
-
+local oldScore = 0
 st.world = {}
 
 function st:resetWorld()
@@ -13,6 +12,7 @@ function st:resetWorld()
 		function(a, b, coll) self:endContact (a, b, coll) end
 		)
 	hs:set(0)
+	oldScore = hs:getSavedHighscore()
 	print ("resetting world")
 end
 
@@ -139,7 +139,7 @@ function st:enter()
 
 	-- pedestrians
 	Signal.register('pedestrian-killed', function (pedestrian)
-		hs:add(-100)
+		-- hs:add(-100)
 		Sound.static["shout"..math.random(2)]:play()
 		local v = Entity.victim(pedestrian.pos)
 		v.color = pedestrian.color
@@ -192,7 +192,12 @@ function st:draw()
 	self.heart_monitor:drawMarker()
 	self.cam:detach()
 
-	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
+	scoretext = ""
+	if oldScore then
+		scoretext = scoretext .. " Previous Score: "..oldScore
+	end
+	love.graphics.printf(scoretext .." Score: "..hs.value, 0,4, SCREEN_WIDTH-15, 'right')
+
 	self.heart_monitor:draw()
 	self.radio:draw()
 end

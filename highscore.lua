@@ -28,7 +28,7 @@ function Highscore:save()
 end
 
 function Highscore:getSavedHighscore()
-	b,c,h = http.request(self.server .."get/", "name=" .. self.name
+	b,c,h = http.request(self.server .."get/", "name=" .. self.name)
 	if not c == 200 then return false end
 	return b
 end
