@@ -21,6 +21,7 @@ function st:update(dt)
 		Gui.Label{text="Please enter your name and press >>Start<<"}
 		Gui.Input{info = inputInfo}
 		if Gui.Button{text="Start"} then
+			GVAR['player_name'] = inputInfo["text"]
 			GS.switch(State.menu)
 		end
 	Gui.group.pop{}
