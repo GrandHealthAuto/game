@@ -5,11 +5,18 @@ local marker = class{name = 'QuestMarker', inherits = Entity.BaseEntity,
 
 		self.physics.shape = love.physics.newCircleShape(radius or 64)
 		self.t = 0
+		self.bobbing_frequency = 1.
+		self.playerInRange = false
 	end
 }
 
 function marker:update(dt)
 	self.t = self.t + dt
+	if self.playerInRange then
+		self.bobbing_frequency = self.bobbing_frequency + dt * 3.
+	else
+		self.bobbing_frequency = 1.
+	end
 end
 
 function marker:draw()
@@ -17,7 +24,7 @@ function marker:draw()
 	love.graphics.draw(Image.pick_me_up, pos.x,
 		pos.y, 0,1.5,1.5,
 		Image.pick_me_up:getWidth()/2,
-		Image.pick_me_up:getHeight() + (.5 + .5*math.sin(self.t*2*math.pi)) * 10 + 5)
+		Image.pick_me_up:getHeight() + (.5 + .5*math.sin((self.t+self.bobbing_frequency)*2*math.pi)) * 10 + 5)
 end
 
 function marker:registerPhysics(...)
