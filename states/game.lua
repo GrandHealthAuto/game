@@ -224,7 +224,7 @@ function st:update(dt)
 	end
 
 	-- awesome camera zooming
-	self.cam:zoomTo(2.1 -  1 / (1 + math.exp(-.02 * self.player.velocity:len() + 5)) * .2)
+	--self.cam:zoomTo(2.1 -  1 / (1 + math.exp(-.02 * self.player.velocity:len() + 5)) * .2)
 
 	self.cam.direction = self.cam.target - self.cam.pos
 	local delta = self.cam.direction * dt * 4
