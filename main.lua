@@ -155,12 +155,12 @@ function love.load()
 
 	love.physics.setMeter (32)
 
-	Input.bind{name = 'left',   key = {'left',  'a'}, axis = -1}
-	Input.bind{name = 'right',  key = {'right', 'd'}, axis = 1}
-	Input.bind{name = 'up',     key = {'up',    'w'}, axis = {-2}}
-	Input.bind{name = 'down',   key = {'down',  's'}, axis = {2}}
-	Input.bind{name = 'accelerate', key = {'up', 'w'}, axis = {-3}}
-	Input.bind{name = 'decelerate', key = {'down','s'}, axis = {3}}
+	Input.bind{name = 'left',   key = {'left'}, axis = -1}
+	Input.bind{name = 'right',  key = {'right', axis = 1}
+	Input.bind{name = 'up',     key = {'up'}, axis = {-2}}
+	Input.bind{name = 'down',   key = {'down'}, axis = {2}}
+	Input.bind{name = 'accelerate', key = {'up'}, axis = {-3}}
+	Input.bind{name = 'decelerate', key = {'down'}, axis = {3}}
 	Input.bind{name = 'action', key = {' ', 'enter', 'return'}, button = 1}
 	Input.bind{name = 'escape', key = 'escape'} -- FIXME: add start button
 end
