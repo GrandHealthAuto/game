@@ -54,19 +54,6 @@ function st:init()
 	self.map = map
 end
 
-function st:getStreetPos()
-	local w = map.width
-	local h = map.height
-	for i = 0, 100 do
-		local x = math.floor(math.random(0, w))
-		local y = math.floor(math.random(0, h))
-		if map:isStreet(x, y) then
-			return map:mapCoordsCenter(x, y)
-		end
-	end
-	return map:mapCoordsCenter(math.floor(math.random(0, w)), math.floor(math.random(0, h)))
-end
-
 function st:enter()
 	self:resetWorld()
 
@@ -76,19 +63,8 @@ function st:enter()
 
 	self.player = Entity.player(map.rescue_zone)
 
-	-- pedestrians
-	self.flock = Entity.flock(50)
-
-	for i = 1,40 do
-		local pos = vector(math.random(0,160 * 32), math.random(0,160 * 32))
-		pos = self:getStreetPos()
-		--local car = Entity.car (vector(map.rescue_zone.x + i * 100, map.rescue_zone.y + 30), 0, "Car " .. i)
-		--car.state = 'reverseLeft'
-		--car.direction = 'east'
-		--car.angle = math.pi - math.random(0,1) + 0.5
-		local car = Entity.car (pos, 0, "Car " .. i)
-		--car:log(car.pos.x .. "," .. car.pos.y .. " " .. car.targetPos.x .. "," .. car.targetPos.y)
-	end
+	-- pedestrians and cars
+	self.flock = Entity.flock(50, 10)
 
 	for rect in pairs(geometry) do
 		Entity.obstacle(vector(rect.x + rect.w * 0.5, rect.y + rect.h * 0.5), vector (rect.w, rect.h))
@@ -181,7 +157,10 @@ end
 
 function st:draw()
 	love.graphics.setColor(255,255,255)
+	local cs = self.cam.scale
+	self.cam.scale = .5
 	self.cam:attach()
+	self.cam.scale = cs
 	map:draw(self.cam)
 	Entities.draw()
 
