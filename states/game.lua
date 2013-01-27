@@ -250,6 +250,7 @@ function st:mappingDown(mapping)
 end
 
 function st:leave()
+	hs:save()
 	Signal.clear_pattern(".*")
 	Entities.clear()
 	self.player = nil
