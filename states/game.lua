@@ -204,7 +204,6 @@ function st:draw()
 		scoretext = scoretext .. " Previous Score: "..oldScore
 	end
 	love.graphics.printf(scoretext .." Score: "..hs.value, 0,4, SCREEN_WIDTH-15, 'right')
-	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
 	love.graphics.printf((self.player.gui_speed .. " km/h"), 0, SCREEN_HEIGHT - 20, SCREEN_WIDTH-10, 'right')
 
 	self.heart_monitor:draw()
