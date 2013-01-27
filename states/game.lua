@@ -3,10 +3,13 @@ local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
 st.world = {}
+local pixelEffects = {require "effects/lights"}
+local sTime =0
 
 function st:resetWorld()
+	sTime = 0
 	st.world = love.physics.newWorld()
-
+	
 	st.world:setCallbacks (
 		function(a, b, coll) self:beginContact (a, b, coll) end,
 		function(a, b, coll) self:endContact (a, b, coll) end
@@ -182,11 +185,15 @@ end
 function st:draw()
 	love.graphics.setColor(255,255,255)
 	self.cam:attach()
+
 	map:draw(self.cam)
+
 	Entities.draw()
 
 	if self.player then
+		if st.sirensfx then love.graphics.setPixelEffect(pixelEffects[1]) end
 		self.player:draw()
+		if st.sirensfx then love.graphics.setPixelEffect() end
 	end
 
 	self.heart_monitor:drawMarker()
@@ -232,6 +239,11 @@ function st:update(dt)
 
 	self.heart_monitor:update(dt)
 	Entities.update(dt)
+	
+	sTime = sTime + dt
+	if sTime >= 1 then sTime = 0 end
+	pixelEffects[1]:send("time",sTime)
+	pixelEffects[1]:send("center", {0.5425,0.5})
 end
 
 return st
