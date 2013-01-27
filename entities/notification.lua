@@ -10,8 +10,8 @@ local notification = class{name = "notification",
 		self.pos = vector(SCREEN_WIDTH/2-64,SCREEN_HEIGHT/2)
 		self.oldfont = {}
 		self.w, self.h = 512, 128
-
-	Signal.register ('get-next-victim', function()
+		
+	function start()
 		self.oldfont = love.graphics.getFont()
 		self.text = "GO GO GO"
 		self.color = {255, 255, 255, 255}
@@ -19,7 +19,8 @@ local notification = class{name = "notification",
 		self.pos = vector(SCREEN_WIDTH/2-self.w/2, SCREEN_HEIGHT/4)
 		Tween(self.duration, self.color, {self.color[1],self.color[2],self.color[3],0})
 	    Tween(self.duration, self.pos, {y = 100}, 'outSine')
-	end)
+	end
+	start()
 
 	Signal.register ('victim-picked-up', function()
 		self.oldfont = love.graphics.getFont()
@@ -29,6 +30,16 @@ local notification = class{name = "notification",
 		self.pos = vector(SCREEN_WIDTH/2-Font.XPDR[self.size]:getWidth(self.text)/2, SCREEN_HEIGHT/4)
 		Tween(self.duration, self.color, {self.color[1],self.color[2],self.color[3],0})
 	    Tween(self.duration, self.pos, {y = 100}, 'outSine')
+	end)
+	
+	Signal.register ('quest-finish', function()
+		self.oldfont = love.graphics.getFont()
+		self.text = "$$$"
+		self.color = {255, 255, 255, 255}
+		self.subtext = "nice one!"
+		self.pos = vector(SCREEN_WIDTH/2-Font.XPDR[self.size]:getWidth(self.text)/2, SCREEN_HEIGHT/4)
+		Tween(self.duration, self.color, {self.color[1],self.color[2],self.color[3],0})
+	    Tween(self.duration, self.pos, {y = 100}, 'outSine')	    
 	end)
 	
 end}
