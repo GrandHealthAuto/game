@@ -106,6 +106,7 @@ function st:enter()
 	Signal.register('get-next-victim', function()
 		local target = next(self.victims)
 		if not target then
+			hs:showHighscore()
 			Signal.emit('game-over', 'no more victims')
 			return
 		end
@@ -117,9 +118,8 @@ function st:enter()
 
 	Signal.register('game-over', function()
 		print "game over"
-		local ht = require "highscoretable"
-		hs:save()
-		ht(hs:getHighscore(0))
+		--hs:save()
+		--st:showHighscore()
 	end)
 	
 	-- pedestrians
@@ -251,5 +251,23 @@ function st:update(dt)
 	self.heart_monitor:update(dt)
 	Entities.update(dt)
 end
+
+function st:showHighscore()
+	local continue
+	continue = Interrupt{
+		draw = function(draw)
+			love.graphics.printf("HIGHSCORE", 0,SCREEN_HEIGHT/4-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
+			draw()
+		end, update = function() Input.update() end,
+	}
+
+	local mappingDown = Input.mappingDown
+	Input.mappingDown = function(mapping, mag)
+		if mapping == 'action' then
+			continue()
+			Input.mappingDown = mappingDown
+		end
+	end
+end 
 
 return st
