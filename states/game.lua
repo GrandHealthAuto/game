@@ -160,6 +160,7 @@ function st:enter()
 
 	-- game-over
 	Signal.register('game-over', function (reason)
+		hs:save()
 		local continue
 		continue = Interrupt{
 			draw = function(draw)
@@ -169,10 +170,11 @@ function st:enter()
 
 				love.graphics.setColor(255,255,255)
 				love.graphics.setFont(Font.XPDR[16])
-				love.graphics.printf("- Game Over -", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-				love.graphics.printf(reason, 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 30,SCREEN_WIDTH, 'center')
-				love.graphics.printf("Press [Escape] to quit game", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 60,SCREEN_WIDTH, 'center')
-				love.graphics.printf("or [Return] to restart", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 90,SCREEN_WIDTH, 'center')
+				love.graphics.printf("- Game Over -", 0,20,SCREEN_WIDTH, 'center')
+				love.graphics.printf(reason, 0,50,SCREEN_WIDTH, 'center')
+				love.graphics.printf("Press [Escape] to quit game", 0,80,SCREEN_WIDTH, 'center')
+				love.graphics.printf("or [Return] to restart", 0,110,SCREEN_WIDTH, 'center')
+				showHighscore()
 			end,
 			update = function() Input.update() end,
 		}
@@ -313,12 +315,17 @@ function st:update(dt)
 end
 
 function showHighscore()
-	local height = SCREEN_HEIGHT/4-Font[30]:getLineHeight();
-	love.graphics.printf("HIGHSCORE", 0,height, SCREEN_WIDTH, 'center')
+	love.graphics.setColor(255,255,255)
+	love.graphics.setFont(Font.XPDR[16])
+
+	local height = 160;
+	love.graphics.printf("- Highscore -", 0,height, SCREEN_WIDTH, 'center')
 	hsData = hs:getHighscore(0)
 	for i, player in pairs(hsData) do
-		height += Font[30]:getLineHeight()
-		love.graphics.printf(player["value"] .. ") " .. player["name"] .. " (" .. player["rank"] .. ".)", 0,height, SCREEN_WIDTH, 'center')
+		height = height +20
+		love.graphics.printf(player["value"],SCREEN_WIDTH /4 - 30,height, SCREEN_WIDTH /4, 'right' )
+		love.graphics.printf(player["name"],(SCREEN_WIDTH /4) * 2, height, SCREEN_WIDTH /4, 'left')
+		--.. player["name"] .. " (" .. player["rank"] .. ".)", 0,height, SCREEN_WIDTH, 'left')
 	end
 end 
 
