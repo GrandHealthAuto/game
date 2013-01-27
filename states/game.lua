@@ -170,7 +170,7 @@ function st:spawn_target()
 	until self.map:cell(p.x,p.y).is_walkable and (p.x < x0 or p.x > x1) and (p.y < y0 or p.y > y1)
 
 	local v = Entity.victim(p*32-vector(16,16))
---	local v = Entity.victim(self.player.pos + vector(400))
+--	local v = Entity.victim(self.player.pos + vector(800))
 	v:init_heartrate_delta()
 	self.victims[v] = v
 	self.current_target = v

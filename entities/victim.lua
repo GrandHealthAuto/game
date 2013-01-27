@@ -20,14 +20,19 @@ local victim = class{name = 'Victim',
 }
 
 function victim:init_heartrate_delta(difficulty)
-	-- 16 is tricky, 10 is hard, 
-	difficulty = difficulty or 20
+	-- 4 is tricky , 10 is easy
+	difficulty = 6
 
-		self.heartrate_delta = (math.abs(self.pos.x - State.game.player.pos.x)
-			+ math.abs(self.pos.y - State.game.player.pos.y)
-			+ math.abs (self.pos.x - State.game.map.rescue_zone.x)
-			+ math.abs(self.pos.y - State.game.map.rescue_zone.y)
-			)/ 400 * 60 / difficulty
+	local distance = 	math.max(self.pos.x, State.game.player.pos.x) - math.min (self.pos.x, State.game.player.pos.x)
+		+ math.max(self.pos.y, State.game.player.pos.y) - math.min (self.pos.y, State.game.player.pos.y)
+		+ math.max(self.pos.x, State.game.map.rescue_zone.x) - math.min (self.pos.x, State.game.map.rescue_zone.x)
+		+ math.max(self.pos.x, State.game.map.rescue_zone.x) - math.min (self.pos.x, State.game.map.rescue_zone.x)
+
+--	print ("distance = " .. distance)
+	
+	self.heartrate_delta = ( 100 / (difficulty * distance / 400) )
+
+--	print ("delta = " .. tostring(self.heartrate_delta))
 
 	self.heartrate = 100
 end
@@ -64,7 +69,7 @@ end
 
 function victim:stabilize()
 	self.is_stabilized = true
-	self.heartrate = self.heartrate + 20
+	self.heartrate = math.min (self.heartrate + 30, 100)
 end
 
 return victim
