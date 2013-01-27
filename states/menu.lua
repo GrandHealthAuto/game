@@ -27,8 +27,6 @@ function st:enter()
 	if not self.music then
 		self.music = Sound.stream.menu:play()
 		self.music:setLooping(true)
-	elseif self.music:isStopped() then
-		self.music:play()
 	end
 end
 
@@ -38,8 +36,9 @@ function st:update(dt)
 	love.graphics.setFont(Font.XPDR[16])
 	Gui.group.push{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .6}}
 	if Gui.Button{text="Start"} then
-		self.music:pause()
-		GS.transition(1, State.game)
+		self.music:stop()
+		self.music = false
+		GS.transition(1, State.entername)
 	end
 	if Gui.Button{text="Highscore"} then
 		GS.transition(.5, State.highscore)
@@ -50,10 +49,6 @@ function st:update(dt)
 		love.event.push('quit')
 	end
 
-	if Gui.Button{text="DELETE ME (firstrun)"} then
-		GS.transition(.5, State.firstrun)
-	end
-	
 	-- on mouse move -> set widget focus to mouse
 	if mouse_hot ~= Gui.mouse.getHot() then
 		Gui.keyboard.setFocus(Gui.mouse.getHot() or Gui.keyboard.getFocus())

@@ -2,6 +2,7 @@ local highscore = require "highscore"
 local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
+local hsData = nil
 st.world = {}
 local pixelEffects = {require "effects/lights"}
 local sTime =0
@@ -55,6 +56,127 @@ local map, geometry
 function st:init()
 	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
 	self.map = map
+
+	Signal.register('quest-timer', function(p)
+		self.pickup_progress = p
+	end)
+
+	Signal.register('quest-abort', function()
+		self.pickup_progress = 0
+	end)
+
+	Signal.register('victim-delivered', function()
+		self.current_passanger = false
+		hs:add(100)
+		Signal.emit('get-next-victim')
+	end)
+
+	Signal.register('victim-picked-up', function()
+		hs:add(50)
+		self.victims[self.current_target] = nil
+		self.current_passanger = self.current_target
+		self.current_passanger:stabilize()
+		self.current_target = false
+		self.marker.physics.body:setPosition(map.rescue_zone:unpack())
+		self.marker:updateFromPhysics()
+	end)
+
+	Signal.register('quest-finish', function()
+		if self.current_passanger then -- deliver at hospital
+			Signal.emit('victim-delivered')
+		else -- pick up victim
+			Signal.emit('victim-picked-up')
+		end
+	end)
+
+	Signal.register('get-next-victim', function()
+		local target = next(self.victims)
+		if not target then
+			return self:spawn_target()
+		end
+		self.current_target = target
+		target:init_heartrate_delta()
+		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
+		self.marker:updateFromPhysics()
+		self.pickup_progress = 0
+	end)
+	
+	-- pedestrians
+	Signal.register('pedestrian-killed', function (pedestrian)
+        hs:add(-5)
+		Sound.static["shout"..math.random(7)]:play():setVolume(0.5)
+		local v = Entity.victim(pedestrian.pos)
+		v.color = pedestrian.color
+		self.victims[v] = v
+		Entities.remove(pedestrian)
+	end)
+
+	-- game-over
+	Signal.register('game-over', function (reason)
+		hs:save()
+		hsData = hs:getHighscore(0)
+		love.audio.stop()
+
+		local continue
+		continue = Interrupt{
+			draw = function(draw)
+				draw()
+				love.graphics.setColor(0,0,0,200)
+				love.graphics.rectangle('fill', 0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
+
+				love.graphics.setColor(255,255,255)
+				love.graphics.setFont(Font.XPDR[16])
+				love.graphics.printf("- Game Over -", 0,20,SCREEN_WIDTH, 'center')
+				love.graphics.printf(reason, 0,50,SCREEN_WIDTH, 'center')
+				love.graphics.printf("Press [Escape] to quit game", 0,80,SCREEN_WIDTH, 'center')
+				love.graphics.printf("or [Return] to restart", 0,110,SCREEN_WIDTH, 'center')
+				showHighscore()
+			end,
+			update = function() Input.update() end,
+		}
+
+		local mappingDown = Input.mappingDown
+		Input.mappingDown = function(mapping, mag)
+			if mapping == 'escape' then
+				love.audio.stop()
+				continue()
+				Input.mappingDown = mappingDown
+				GS.switch(State.menu)
+			elseif mapping == 'action' then
+				continue()
+				Input.mappingDown = mappingDown
+				GS.switch(State.game)
+			end
+		end
+	end)
+end
+
+function st:spawn_target()
+	print ("spawned target")
+
+	-- rotated bounding box
+	local xul,yul = self.cam:worldCoords(-SCREEN_WIDTH,-SCREEN_HEIGHT)
+	local xll,yll = self.cam:worldCoords(-SCREEN_WIDTH, SCREEN_HEIGHT)
+	local xur,yur = self.cam:worldCoords( SCREEN_WIDTH,-SCREEN_HEIGHT)
+	local xlr,ylr = self.cam:worldCoords( SCREEN_WIDTH, SCREEN_HEIGHT)
+
+	-- axis aligned bounding box
+	local x0,y0 = math.min(xul, xll, xur, xlr), math.min(yul, yll, yur, ylr)
+	local x1,y1 = math.max(xul, xll, xur, xlr), math.max(yul, yll, yur, ylr)
+
+	x0,y0 = x0/32, y0/32
+	x1,y1 = x1/32, y1/32
+
+	local p = vector(0,0)
+	repeat
+		p.x = math.random(3, self.map.width - 3)
+		p.y = math.random(3, self.map.height - 3)
+	until self.map:cell(p.x,p.y).is_walkable and (p.x < x0 or p.x > x1) and (p.y < y0 or p.y > y1)
+
+	local v = Entity.victim(p*32-vector(16,16))
+	self.victims[v] = v
+	self.current_target = v
+	Signal.emit('get-next-victim')
 end
 
 function st:enter()
@@ -65,6 +187,8 @@ function st:enter()
 	self.cam.pos = vector(self.cam.x, self.cam.y)
 
 	self.player = Entity.player(map.rescue_zone)
+
+	self.notification = Entity.notification ("undefined")
 
 	-- pedestrians and cars
 	self.flock = Entity.flock(50, 10)
@@ -80,58 +204,9 @@ function st:enter()
 	self.current_passanger = false
 	self.pickup_progress   = 0
 
-	Signal.register('victim-pickup-timer', function(p)
-		self.pickup_progress = p
-	end)
-
-	Signal.register('victim-pickup-abort', function()
-		self.pickup_progress = 0
-	end)
-
-	Signal.register('victim-picked-up', function()
-		if self.current_passanger then -- deliver at hospital
-			self.current_passanger = false
-			hs:add(100)
-			Signal.emit('get-next-victim')
-		else -- pick up victim
-			hs:add(50)
-			self.victims[self.current_target] = nil
-			self.current_passanger = self.current_target
-			self.current_passanger:stabilize()
-			self.current_target = false
-			self.marker.physics.body:setPosition(map.rescue_zone:unpack())
-			self.marker:updateFromPhysics()
-		end
-	end)
-
-	Signal.register('get-next-victim', function()
-		local target = next(self.victims)
-		if not target then
-			Signal.emit('game-over', 'no more victims')
-			return
-		end
-		self.current_target = target
-		self.marker.physics.body:setPosition(self.current_target.pos:unpack())
-		self.marker:updateFromPhysics()
-		self.pickup_progress = 0
-	end)
-
-	-- pedestrians
-	Signal.register('pedestrian-killed', function (pedestrian)
-		-- hs:add(-100)
-		Sound.static["shout"..math.random(2)]:play()
-		local v = Entity.victim(pedestrian.pos)
-		v.color = pedestrian.color
-		self.victims[v] = v
-		Entities.remove(pedestrian)
-	end)
-
 	Entities.registerPhysics(self.world)
 
-	-- XXX: properly initialize this
-	local v = Entity.victim(map.rescue_zone + vector(500,0))
-	self.victims[v] = v
-	Signal.emit('get-next-victim')
+	self:spawn_target()
 
 	self.heart_monitor = Entity.heartmonitor()
 	self.radio = Entity.radio()
@@ -161,17 +236,20 @@ function st:mappingDown(mapping)
 				love.graphics.printf("- PAUSE -", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
 				love.graphics.printf("Press [Escape] to quit game", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 30,SCREEN_WIDTH, 'center')
 				love.graphics.printf("or [Return] to continue", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight() + 60,SCREEN_WIDTH, 'center')
-			end, update = function() Input.update() end,
+			end,
+			update = function() Input.update() end,
+			transition = function() end
 		}
 
 		local mappingDown = Input.mappingDown
 		Input.mappingDown = function(mapping, mag)
 			if mapping == 'escape' then
 				love.audio.stop()
-				GS.switch(State.menu)
 				continue()
+				GS.switch(State.menu)
 				Input.mappingDown = mappingDown
 			elseif mapping == 'action' then
+				print ("got something")
 				continue()
 				Input.mappingDown = mappingDown
 			end
@@ -211,11 +289,12 @@ function st:draw()
 		scoretext = scoretext .. " Previous Score: "..oldScore
 	end
 	love.graphics.printf(scoretext .." Score: "..hs.value, 0,4, SCREEN_WIDTH-15, 'right')
-	love.graphics.printf(hs.value, 0,4, SCREEN_WIDTH-10, 'right')
 	love.graphics.printf((self.player.gui_speed .. " km/h"), 0, SCREEN_HEIGHT - 20, SCREEN_WIDTH-10, 'right')
 
 	self.heart_monitor:draw()
 	self.radio:draw()
+
+	self.notification:draw()
 end
 
 function st:update(dt)
@@ -241,7 +320,8 @@ function st:update(dt)
 	if math.abs(self.cam.direction.y) > SCREEN_HEIGHT/3 then
 		delta.y = self.cam.direction.y
 	end
-	self.cam.pos = self.cam.pos + delta
+
+	self.cam.pos = self.map:adjustInboundPos(self.cam.pos + delta, self.cam)
 	self.cam:lookAt(math.floor(self.cam.pos.x+.5), math.floor(self.cam.pos.y+.5))
 
 	self.world:update(dt)
@@ -254,5 +334,19 @@ function st:update(dt)
 	pixelEffects[1]:send("time",sTime)
 	pixelEffects[1]:send("center", {0.5425,0.5})
 end
+
+function showHighscore()
+	love.graphics.setColor(255,255,255)
+	love.graphics.setFont(Font.XPDR[16])
+
+	local height = 160;
+	love.graphics.printf("- Highscore -", 0,height, SCREEN_WIDTH, 'center')
+	for i, player in pairs(hsData) do
+		height = height +20
+		love.graphics.printf(player["value"],SCREEN_WIDTH /4 - 30,height, SCREEN_WIDTH /4, 'right' )
+		love.graphics.printf(player["name"],(SCREEN_WIDTH /4) * 2, height, SCREEN_WIDTH /4, 'left')
+		--.. player["name"] .. " (" .. player["rank"] .. ".)", 0,height, SCREEN_WIDTH, 'left')
+	end
+end 
 
 return st

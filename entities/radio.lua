@@ -14,7 +14,8 @@ local radio = class{name = 'Radio',
 }
 
 function radio:play(id)
-    self.music = self.sender[self.id].snd:play()
+    if self.music then self.music:stop() end
+    self.music = self.sender[id].snd:play()
     self.music:setVolume(self.volume)
     self.music:setLooping(true)
 end

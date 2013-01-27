@@ -12,6 +12,7 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 		self.state = 'drive'
 		self.lastStateUpdate = love.timer.getMicroTime()
 		self.mass = 1
+		self.color = { math.random() * 128 + 128, math.random() * 64 + 192, math.random() * 64 + 192, 255 }
 
 		self.physics.shape = love.physics.newPolygonShape(
 			-24 + 10,  8,
@@ -323,6 +324,7 @@ function car:findNextTarget(map, pos, v)
 		table.insert(changes, {name = 'left', target = target, direction = self:getLeftDirection(self.direction)})
 	end
 	if #changes == 0 then
+		self.speedMultiplier = math.floor(self.speedMultiplier * 0.6)
 		return self:searchStreet(map, pos, v)
 	end
 	local i = math.floor(math.random(0, #changes - 1)) + 1
@@ -330,6 +332,7 @@ function car:findNextTarget(map, pos, v)
 	if changes[i].direction ~= self.direction then
 		self:log("Change direction from " .. self.direction .. " to " .. changes[i].direction)
 		self.direction = changes[i].direction
+		self.speedMultiplier = math.floor(self.speedMultiplier * 0.6)
 	end
 	return map:mapCoordsCenter(changes[i].target.x, changes[i].target.y)
 end
@@ -347,6 +350,9 @@ function car:getTargetPosition()
 	if self.state ~= 'drive' then
 		self.targetPos = self.pos
 		return self.pos
+	end
+	if self.pos:dist(self.targetPos) > 300 then
+		self.targetPos = self.pos
 	end
 	-- Check if we are in the target. If not we continue
 	local targetX, targetY = map:tileCoords(self.targetPos.x, self.targetPos.y)
@@ -369,7 +375,7 @@ function car:getTargetPosition()
 end
 
 function car:update(dt)
-	self.flock:maybeRelocate(self)
+	self.flock:maybeRelocate(self, true)
 
 	self.hitList = {}
 	self:updateFromPhysics()

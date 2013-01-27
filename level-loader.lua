@@ -163,6 +163,20 @@ return function(map_path, tile_info, tile_data)
 		return (x - 1) * TW, y * TH, x * TW, (y + 1) * TH
 	end
 
+	-- Maximum world coordinates
+	function map:mapCoordsMax()
+		return self.width * TW, self.height * TH
+	end
+
+	-- Adjust position to be within the map
+	function map:adjustInboundPos(pos, cam)
+		local worldWidth, worldHeight = self:mapCoordsMax()
+		local w,h = SCREEN_WIDTH/2 / cam.scale - TW, SCREEN_HEIGHT/2 / cam.scale - TH
+		local x = math.min(math.max(pos.x, w), worldWidth - w)
+		local y = math.min(math.max(pos.y, h), worldHeight - h)
+		return vector(x, y)
+	end
+
 	function map:mapCoordsCenter(x, y)
 		local x1, y1, x2, y2 = self:mapCoords(x, y)
 		return vector((x2 + x1) / 2, (y2 + y1) / 2)
