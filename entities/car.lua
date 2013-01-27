@@ -31,14 +31,13 @@ local car = class{name = "Car", inherits = Entity.BaseEntity,
 function car:getCollisionLines() 
 	local lines = {}
 	
-	local headingSize = 38
-	local headingAngle = 3.14159 / 36 * 1 -- 10°
+	local xV = vector (math.cos(self.angle), math.sin(self.angle))
+	local yV = xV:rotated(math.pi / 2)
 
-	local headingLeft = self.pos + headingSize * vector (math.cos(self.angle - headingAngle), math.sin(self.angle - headingAngle))
-	local headingRight = self.pos + headingSize * vector (math.cos(self.angle + headingAngle), math.sin(self.angle + headingAngle))
+	local x, y = 40, 4
+	local headingLeft = self.pos + x * xV - y * yV
+	local headingRight = self.pos + x * xV + y * yV
 
-	table.insert(lines, {x1 = self.pos.x, y1 = self.pos.y, x2 = headingLeft.x, y2 = headingLeft.y })
-	table.insert(lines, {x1 = self.pos.x, y1 = self.pos.y, x2 = headingRight.x, y2 = headingRight.y })
 	table.insert(lines, {x1 = headingLeft.x, y1 = headingLeft.y, x2 = headingRight.x, y2 = headingRight.y })
 	return lines
 end
@@ -106,17 +105,20 @@ function car:getAngle(p1, p2)
 	local d = p2 - p1
 	
 	local angle = math.atan2(d.y, d.x)
-	if angle < 0 then
-		angle = angle + 2 * math.pi
-	end
+	--if angle < 0 then
+	--	angle = angle + 2 * math.pi
+	--end
 	return angle
 end
 
 function car:updatePosition(dt, angle) 
 	local heading = vector (math.cos(angle), math.sin(angle))
 	local angleD = angle - self.angle
-	if (angleD > math.pi) then
+	while (angleD > math.pi) do
 		angleD = angleD - 2 * math.pi
+	end
+	while (angleD < -math.pi) do
+		angleD = angleD + 2 * math.pi
 	end
 	--self:log("self:angle="..self.angle.." angle="..angle)
 	
@@ -208,21 +210,24 @@ function car:findNextTarget(map, pos, v)
 	local ahead4 = pos + 3 * v
 	local right = pos + rV
 	local right4 = pos + 3 * rV
-	local left = pos + lV
-	local left4 = pos + 3 * lV
+	local left = pos + v + lV
+	local left4 = pos + v + 3 * lV
 
 	local changes = {}
 	if map:isStreet(ahead.x, ahead.y) and map:isStreet(ahead4.x, ahead4.y) then
 		self:log("Find next target: Can drive ahead")
-		table.insert(changes, {name = 'ahead', target = ahead, direction = self.direction})
+		local target = pos + 2 * v
+		table.insert(changes, {name = 'ahead', target = target, direction = self.direction})
 	end
 	if map:isStreet(right.x, right.y) and map:isStreet(right4.x, right4.y) then
 		self:log("Find next target: Can turn right")
-		table.insert(changes, {name = 'right', target = right, direction = self:getRightDirection(self.direction)})
+		local target = pos + 2 * rV
+		table.insert(changes, {name = 'right', target = target, direction = self:getRightDirection(self.direction)})
 	end
 	if map:isStreet(left.x, left.y) and map:isStreet(left4.x, left4.y) then
 		self:log("Find next target: Can turn left")
-		table.insert(changes, {name = 'left', target = left, direction = self:getLeftDirection(self.direction)})
+		local target = pos + v + 2 * lV
+		table.insert(changes, {name = 'left', target = target, direction = self:getLeftDirection(self.direction)})
 	end
 	if #changes == 0 then
 		if map:isStreet(ahead4.x, ahead4.y) then
@@ -291,7 +296,7 @@ function car:update(dt)
 	--self:log("Target position is " .. self.targetPos.x .. ", " .. self.targetPos.y .. " with angle " .. angle)
 	self:updatePosition(dt, angle)
 
-	self:log("velocity: " .. tostring(self.velocity))
+	--self:log("velocity: " .. tostring(self.velocity))
 
 	self:updateToPhysics()
 end
