@@ -35,15 +35,18 @@ GVAR = {
 }
 
 function serialize(t, indent)
+	local result = ""
 	indent = "  " or indent
 	for k,v in pairs(t) do
 		if type(v) == "table" then
-			print (indent .. " " .. k .. " = table (" .. tostring(v) .. "):")
-			serialize (v, indent .. "  ")
+			result = result .. (indent .. " " .. k .. " = table (" .. tostring(v) .. "):") .. "\n"
+			result = result .. serialize (v, indent .. "  ") .. "\n"
 		else
-			print (indent .. " " .. k .. " = " .. tostring(v))
+			result = result .. (indent .. " " .. k .. " = " .. tostring(v)) .. "\n"
 		end
 	end
+
+	return result
 end
 
 function GS.transition(length, to, ...)
@@ -172,33 +175,6 @@ function love.keypressed(key)
 end
 
 function Input.mappingDown(mapping, mag)
-	if mapping == 'escape' then
-		local continue
-		continue = Interrupt{
-			draw = function(draw)
-				draw()
-				love.graphics.setColor(0,0,0,200)
-				love.graphics.rectangle('fill', 0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
-
-				love.graphics.setColor(255,255,255)
-				love.graphics.setFont(Font[30])
-				love.graphics.printf("PAUSE", 0,SCREEN_HEIGHT/2-Font[30]:getLineHeight(),SCREEN_WIDTH, 'center')
-			end, update = function() Input.update() end,
-		}
-
-		local mappingDown = Input.mappingDown
-		Input.mappingDown = function(mapping, mag)
-			if mapping == 'escape' then
-				love.audio.stop()
-				GS.transition(.5, State.menu)
-				continue()
-				Input.mappingDown = mappingDown
-			elseif mapping == 'action' then
-				continue()
-				Input.mappingDown = mappingDown
-			end
-		end
-	end
 	GS.mappingDown(mapping, mag)
 end
 
