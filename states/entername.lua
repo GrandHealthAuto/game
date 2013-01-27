@@ -17,12 +17,14 @@ function st:enter()
 end
 
 function st:update(dt)
+	love.graphics.setFont(Font.XPDR[16])
+
 	Gui.group.push{grow = "down", pos={SCREEN_WIDTH/2-Gui.group.default.size[1]/2,SCREEN_HEIGHT/2}}
 		Gui.Label{text="Please enter your name and press >>Start<<"}
 		Gui.Input{info = inputInfo}
 		if Gui.Button{text="Start"} then
 			GVAR['player_name'] = inputInfo["text"]
-			GS.transition(.5, State.menu)
+			GS.transition(.5, State.game)
 		end
 	Gui.group.pop{}
 	-- on mouse move -> set widget focus to mouse
@@ -46,7 +48,7 @@ function st:mappingDown(mapping)
 end
 
 function st:keypressed(key,code)
-	if (code >= 65 and code <= 90) or (code >=97 and code <=122) or code == 8 or code == 9  or code == 32 or key=="return" then
+	if (code >= 65 and code <= 90) or (code >=97 and code <=122) or code == 8 or code == 9  or code == 32 or key == "return" then
 		Gui.keyboard.pressed(key, code)
 	end
 end
