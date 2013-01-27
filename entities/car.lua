@@ -349,6 +349,9 @@ function car:getTargetPosition()
 		self.targetPos = self.pos
 		return self.pos
 	end
+	if self.pos:dist(self.targetPos) > 300 then
+		self.targetPos = self.pos
+	end
 	-- Check if we are in the target. If not we continue
 	local targetX, targetY = map:tileCoords(self.targetPos.x, self.targetPos.y)
 	if x ~= targetX or y ~= targetY then
@@ -370,7 +373,7 @@ function car:getTargetPosition()
 end
 
 function car:update(dt)
-	self.flock:maybeRelocate(self)
+	self.flock:maybeRelocate(self, true)
 
 	self.hitList = {}
 	self:updateFromPhysics()
