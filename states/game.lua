@@ -298,9 +298,7 @@ function st:draw()
 	Entities.draw()
 
 	if self.player then
-		if st.sirensfx then love.graphics.setPixelEffect(pixelEffects[1]) end
 		self.player:draw()
-		if st.sirensfx then love.graphics.setPixelEffect() end
 	end
 
 	self.heart_monitor:drawMarker()
@@ -317,7 +315,9 @@ function st:draw()
 	self.radio:draw()
 
 	love.graphics.setCanvas()
+	if st.sirensfx then love.graphics.setPixelEffect(pixelEffects[1]) end
 	love.graphics.draw(fb)
+	if st.sirensfx then love.graphics.setPixelEffect() end
 	self.notification:draw()	
 end
 
