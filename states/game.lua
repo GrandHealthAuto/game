@@ -285,6 +285,8 @@ function st:leave()
 end
 
 function st:draw()
+	fb = love.graphics.newCanvas(SCREEN_WIDTH, SCREEN_HEIGHT)
+	love.graphics.setCanvas(fb)
 	love.graphics.setColor(255,255,255)
 	--local cs = self.cam.scale
 	--self.cam.scale = .5
@@ -314,7 +316,9 @@ function st:draw()
 	self.heart_monitor:draw()
 	self.radio:draw()
 
-	self.notification:draw()
+	love.graphics.setCanvas()
+	love.graphics.draw(fb)
+	self.notification:draw()	
 end
 
 function st:update(dt)
