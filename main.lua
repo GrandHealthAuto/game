@@ -11,6 +11,8 @@ Tween      = require "tween"
 
 require 'slam'
 
+function print() end
+
 -- evil global variables
 GVAR = {
 	draw_collision_boxes = false,
@@ -18,7 +20,7 @@ GVAR = {
 	player_linear_damping = 0.19 * 32,
 	player_angular_damping = 0.1,
 
-	player_accel = 35. * 32, -- m/s^2
+	player_accel = 60 * 35. * 32, -- m/s^2
 	player_accel_max_speed = 20 * 32, -- m/s
 	player_motor_sound_maxspeed = 20 * 32,
 	player_reverse = -20. * 32, -- m/s^2
@@ -155,12 +157,12 @@ function love.load()
 
 	love.physics.setMeter (32)
 
-	Input.bind{name = 'left',   key = {'left',  'a'}, axis = -1}
-	Input.bind{name = 'right',  key = {'right', 'd'}, axis = 1}
-	Input.bind{name = 'up',     key = {'up',    'w'}, axis = {-2}}
-	Input.bind{name = 'down',   key = {'down',  's'}, axis = {2}}
-	Input.bind{name = 'accelerate', key = {'up', 'w'}, axis = {-3}}
-	Input.bind{name = 'decelerate', key = {'down','s'}, axis = {3}}
+	Input.bind{name = 'left',   key = {'left'}, axis = -1}
+	Input.bind{name = 'right',  key = {'right'}, axis = 1}
+	Input.bind{name = 'up',     key = {'up'}, axis = {-2}}
+	Input.bind{name = 'down',   key = {'down'}, axis = {2}}
+	Input.bind{name = 'accelerate', key = {'up'}, axis = {-3}}
+	Input.bind{name = 'decelerate', key = {'down'}, axis = {3}}
 	Input.bind{name = 'action', key = {' ', 'enter', 'return'}, button = 1}
 	Input.bind{name = 'escape', key = 'escape'} -- FIXME: add start button
 end

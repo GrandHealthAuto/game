@@ -15,36 +15,44 @@ end
 
 function st:update(dt)
 	local w = (SCREEN_WIDTH-50)/2
+	love.graphics.setFont(Font.XPDR[16])
+	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT - 90}, function()
+		Gui.group{grow="right", size={w}, function()
+			local ox = w + 5
+			if offset > 0 then
+				if Gui.Button{id = 'prev', text="PREVIOUS PAGE"} then
+					offset = offset - 7
+					if offset < 0 then offset = 0 end
+					hsData = hs:getHighscore(offset)
+				end
+				ox = 0
+			end
+			if #hsData >= 7 then
+				if Gui.Button{id = 'next', text="NEXT PAGE", pos = {ox}} then
+					offset = offset + 7
+					hsData = hs:getHighscore(offset)
+				end
+			end
+		end}
+		if Gui.Button{id = 'back', text="BACK"} then
+			GS.switch(State.menu)
+		end
+	end}
+
+	w = SCREEN_WIDTH-600
 	love.graphics.setFont(Font.XPDR[20])
-	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT * .51}, function()
+	Gui.group{grow = "down", size = {w,40}, pos = {300,SCREEN_HEIGHT * .51}, function()
 		if hsData then
 			for i = 1,math.min(#hsData, 7) do
 				local player = hsData[i]
-				Gui.group.push{grow="right", size={w, 30}}
-					Gui.Label{text=player["name"],  align = "right", size = {w-10}}
-					Gui.Label{text=player["value"], align="left", pos = {10}}
+				Gui.group.push{grow="right", size={nil, 30}}
+					Gui.Label{text=player.rank .. '. ',  align = "right", size = {20}}
+					Gui.Label{text=player.name, align = "left", size = {w-114}}
+					Gui.Label{text=player.value, align="right", size = {90}}
 				Gui.group.pop{}
 			end
 		else
 			Gui.Label{text="The highscore server is currently not reachable"}
-		end
-	end}
-
-	love.graphics.setFont(Font.XPDR[16])
-	Gui.group{grow = "down", size = {SCREEN_WIDTH-50,40}, pos = {25,SCREEN_HEIGHT - 90}, function()
-		Gui.group{grow="right", size={w}, function()
-			if Gui.Button{text="PREVIOUS PAGE"} then
-				offset = offset - 7
-				if offset < 0 then offset = 0 end
-				hsData = hs:getHighscore(offset)
-			end
-			if Gui.Button{text="NEXT PAGE"} then
-				offset = offset + 7
-				hsData = hs:getHighscore(offset)
-			end
-		end}
-		if Gui.Button{text="BACK"} then
-			GS.switch(State.menu)
 		end
 	end}
 

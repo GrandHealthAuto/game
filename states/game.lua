@@ -3,6 +3,7 @@ local hs = highscore(GVAR['player_name'])
 local st = GS.new()
 local oldScore = 0
 local hsData = nil
+local map, geometry
 st.world = {}
 local pixelEffects = {require "effects/bluelights"}
 local sTime =0
@@ -52,11 +53,7 @@ function st:endContact (a, b, coll)
 	end
 end
 
-local map, geometry
-function st:init()
-	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
-	self.map = map
-
+function st:registerSignals()
 	Signal.register('quest-timer', function(p)
 		self.pickup_progress = p
 	end)
@@ -66,8 +63,10 @@ function st:init()
 	end)
 
 	Signal.register('victim-delivered', function()
+		local points = 100 + (math.floor((self.current_passanger.heartrate * 0.25) / 10) * 10)
+		print (points)
+		hs:add(points)
 		self.current_passanger = false
-		hs:add(100)
 		Signal.emit('get-next-victim')
 	end)
 
@@ -77,7 +76,7 @@ function st:init()
 		self.current_passanger = self.current_target
 		self.current_passanger:stabilize()
 		self.current_target = false
-		self.marker.physics.body:setPosition(map.rescue_zone:unpack())
+		self.marker.physics.body:setPosition(self.map.rescue_zone:unpack())
 		self.marker:updateFromPhysics()
 	end)
 
@@ -151,6 +150,11 @@ function st:init()
 	end)
 end
 
+function st:init()
+	map, geometry = (require 'level-loader')('map.png', require'tileinfo', require 'tiledata')
+	self.map = map
+end
+
 function st:spawn_target()
 
 	-- rotated bounding box
@@ -181,7 +185,20 @@ function st:spawn_target()
 end
 
 function st:enter()
+	love.mouse.setVisible(false)
 	self:resetWorld()
+
+	local s = (require 'hump.signal').new() -- hackety hack
+	Signal = {
+		register       = function(...) s:register(...) end,
+		emit           = function(...) s:emit(...) end,
+		remove         = function(...) s:remove(...) end,
+		clear          = function(...) s:clear(...) end,
+		emit_pattern   = function(...) s:emit_pattern(...) end,
+		remove_pattern = function(...) s:remove_pattern(...) end,
+		clear_pattern  = function(...) s:clear_pattern(...) end,
+	}
+	self:registerSignals()
 
 	self.cam = Camera()
 	self.cam.scale = 2
@@ -190,6 +207,7 @@ function st:enter()
 	self.player = Entity.player(map.rescue_zone)
 
 	self.notification = Entity.notification ("undefined")
+	self.popup = Entity.notification ("undefined")
 
 	-- pedestrians and cars
 	self.flock = Entity.flock(50, 10)
@@ -263,6 +281,7 @@ function st:leave()
 	Signal.clear()
 	Entities.clear()
 	self.player = nil
+	love.mouse.setVisible(true)
 end
 
 function st:draw()

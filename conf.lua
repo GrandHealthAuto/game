@@ -3,7 +3,7 @@ function love.conf(t)
 	t.author            = "GGJ13"
 	t.url               = "http://globalgamejam.org/2013/grand-health-auto"
 	t.identity          = "grand_health_auto"
-	--t.release           = true
+	t.release           = true
 
 	t.screen.width      = 1024
 	t.screen.height     = 720

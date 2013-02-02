@@ -1,1 +1,3 @@
 CC BY-NC-SA 3.0
+
+Some sound samples from freesound were used to make this game.

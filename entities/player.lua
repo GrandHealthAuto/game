@@ -69,10 +69,10 @@ function player:update(dt)
 		self.angle_velocity = 0.
 
 		if speed < GVAR["player_accel_max_speed"] then
-			acceleration = self.heading * GVAR["player_accel"] * 1. 
+			acceleration = self.heading * GVAR["player_accel"] * dt
 		else
 			print ("superspeed")
-			acceleration = self.heading * GVAR["player_accel"] * 1.
+			acceleration = self.heading * GVAR["player_accel"] * dt
 		end
 	end
 
