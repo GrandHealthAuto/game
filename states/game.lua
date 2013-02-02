@@ -5,7 +5,7 @@ local oldScore = 0
 local hsData = nil
 local map, geometry
 st.world = {}
-local pixelEffects = {require "effects/bluelights"}
+local pixelEffects = {require "effects/cameffect"}
 local sTime =0
 
 function st:resetWorld()
@@ -285,8 +285,10 @@ function st:leave()
 end
 
 function st:draw()
-	fb = love.graphics.newCanvas(SCREEN_WIDTH, SCREEN_HEIGHT)
-	love.graphics.setCanvas(fb)
+	fb1 = love.graphics.newCanvas(SCREEN_WIDTH, SCREEN_HEIGHT)
+	fb2 = love.graphics.newCanvas(SCREEN_WIDTH, SCREEN_HEIGHT)
+	-- first canvas
+	love.graphics.setCanvas(fb1)
 	love.graphics.setColor(255,255,255)
 	--local cs = self.cam.scale
 	--self.cam.scale = .5
@@ -314,10 +316,18 @@ function st:draw()
 	self.heart_monitor:draw()
 	self.radio:draw()
 
+	-- first shader applied to fb1 rendered to fb2
+	love.graphics.setCanvas(fb2)
+	-- post processing to make picture darker to the edges of screen
+	love.graphics.setPixelEffect(pixelEffects[1])
+	love.graphics.draw(fb1)
+	love.graphics.setPixelEffect()
+	
+	-- render to final image
 	love.graphics.setCanvas()
-	if st.sirensfx then love.graphics.setPixelEffect(pixelEffects[1]) end
-	love.graphics.draw(fb)
-	if st.sirensfx then love.graphics.setPixelEffect() end
+	love.graphics.draw(fb2)
+	-- 
+
 	self.notification:draw()	
 end
 
@@ -354,10 +364,8 @@ function st:update(dt)
 	Entities.update(dt)
 	
 	sTime = sTime + dt
-	if sTime >= 1 then sTime = 0 end
-	---pixelEffects[1]:send("time",sTime)
-	pixelEffects[1]:send("light1", {0.5425,0.2})
-	pixelEffects[1]:send("light2", {0.5425,0.8})
+
+	pixelEffects[1]:send("cammera", { 0.5 , 0.5 })
 end
 
 function showHighscore()
